@@ -42,10 +42,47 @@
 @;	Parámetros:
 @;		R0 = dirección base de la matriz de juego
 @;		R1 = número de mapa de configuración
+@;		R2 = indice columna
+@;		R3 = indice fila
+@;		R4 = backup de la direccion base se la matriz
+@;		R5 = total columnas
+@;		R6 = puntero
+@;		R7 = mapas
+@;		R8 = temporal
 	.global inicializa_matriz
 inicializa_matriz:
-		push {lr}		@;guardar registros utilizados
+		push {lr}			@;guardar registros utilizados
 		
+		mov r4, r0			@;backup de la direccion base de la matriz
+		
+		ldr r7, =mapas		@;carreguem els mapes
+		mov r5, #COLUMNS	
+		mov r3, #ROWS
+		mul r8, r5,r3		@;multipliquem files per columnes
+		mul r8, r1			@;passem el numero de mapa de configuracio
+		add r7, r8			@;accedim al mapa
+		
+		mov r6, #0			@;inicializamos puntero
+		mov r3, #0			@;inicializamos filas
+	.L_buclefilas:
+		mov r2, #0			@;inicializamos columnas
+	.L_buclecol:
+		ldrb r8, [r4, r6]	@;R5 = valor casilla (r3, r2)
+		
+		
+		
+		@;tratamiento del codigo
+		
+		
+		
+		add r6, #1			@;avanza posicion
+		add r2, #1			@;avanza columna
+		cmp r2, #COLUMNS	@;comprueba que no sea el final de la fila
+		blo .L_buclecol		@;sino esta al final, avanza al siguiente elemento
+		@;si esta al final de columna:
+		add r3, #1			@;avanza fila
+		cmp r3, #ROWS		@;comprueba que no sea el final de columna
+		blo .L_buclefilas	@;si no esta al final, avanza al siguiente elemento
 		
 		pop {pc}			@;recuperar registros y volver
 
