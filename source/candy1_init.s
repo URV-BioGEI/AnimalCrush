@@ -48,10 +48,11 @@
 @;		R5 = total columnas
 @;		R6 = puntero
 @;		R7 = mapas
-@;		R8 = temporal
+@;		R8 = valor casilla
+@;		R9 = temporal
 	.global inicializa_matriz
 inicializa_matriz:
-		push {lr}			@;guardar registros utilizados
+		push {r1-r9, lr}			@;guardar registros utilizados
 		
 		mov r4, r0			@;backup de la direccion base de la matriz
 		
@@ -67,14 +68,38 @@ inicializa_matriz:
 	.L_buclefilas:
 		mov r2, #0			@;inicializamos columnas
 	.L_buclecol:
-		ldrb r8, [r4, r6]	@;R5 = valor casilla (r3, r2)
+		ldrb r8, [r4, r6]	@;R8 = valor casilla (r3, r2)
 		
 		
+		cmp r8, #0			@;comparamos con objeto variable
+		beq	.L_buclerandom		@;si es variable saltamos al bucle random
+		cmp r8, #8
+		beq .L_buclerandom
+		cmp r8, #16
+		beq .L_buclerandom
 		
-		@;tratamiento del codigo
+	.L_buclerandom:			@;bucle per asignar un numero aleatori, si forma un combinacio de 3, es busca un altre numero
+		mov r9, #0				@;netejem el temporal
+		mov r0, #6				@;li passem el maxim de rang aleatori
+		bl mod_random			@;cridem a la funcio random
+		add r0, #1				@;li sumem 1 per a que no surti cap 0
+		add r9, r8, r0			@;al temporal r8 guardo el valor de la seva posicio mes el valor random que hem obtingut
+		mov r0, r4				@;recuperem la direccio base per passar-li al cuenta_repeticiones
+		mov r1, r3				@;guardem el valor de les files a r1 per passar-li a la rutina (ja tenim les columnes a r2)
+		mov r3, #2				@;i li passem la direccio (oest) a r3
+		@;bl cuenta_repeticiones	
+		mov r0, #2				@;JOC DE PROVES<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+		cmp r0, #3				@;comprovar que no formi una repeticio de 3
+		beq .L_buclerandom			@;torna a repetir el bucle si forma repeticio
+		@;ara fem el mateix pero per la direcico nord
+		mov r3, #3				@;i li passem la direccio (oest) a r3
+		@;bl cuenta_repeticiones	
+		mov r0, #2				@;JOC DE PROVES<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+		cmp r0, #3				@;comprovar que no formi una repeticio de 3
 		
+		beq .L_buclerandom			@;torna a repetir el bucle si forma repeticio
 		
-		
+		@;si no forma cap repeticio, anem a la seguent posicio
 		add r6, #1			@;avanza posicion
 		add r2, #1			@;avanza columna
 		cmp r2, #COLUMNS	@;comprueba que no sea el final de la fila
@@ -84,7 +109,7 @@ inicializa_matriz:
 		cmp r3, #ROWS		@;comprueba que no sea el final de columna
 		blo .L_buclefilas	@;si no esta al final, avanza al siguiente elemento
 		
-		pop {pc}			@;recuperar registros y volver
+		pop {r1-r9, pc}			@;recuperar registros y volver
 
 
 
