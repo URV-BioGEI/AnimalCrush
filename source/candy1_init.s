@@ -87,16 +87,13 @@ inicializa_matriz:
 		mov r0, r4				@;recuperem la direccio base per passar-li al cuenta_repeticiones
 		mov r1, r3				@;guardem el valor de les files a r1 per passar-li a la rutina (ja tenim les columnes a r2)
 		mov r3, #2				@;i li passem la direccio (oest) a r3
-		@;bl cuenta_repeticiones	
-		mov r0, #2				@;JOC DE PROVES<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+		bl cuenta_repeticiones	
 		cmp r0, #3				@;comprovar que no formi una repeticio de 3
 		beq .L_buclerandom			@;torna a repetir el bucle si forma repeticio
 		@;ara fem el mateix pero per la direcico nord
-		mov r3, #3				@;i li passem la direccio (oest) a r3
-		@;bl cuenta_repeticiones	
-		mov r0, #2				@;JOC DE PROVES<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+		mov r3, #3				@;i li passem la direccio (nord) a r3
+		bl cuenta_repeticiones	
 		cmp r0, #3				@;comprovar que no formi una repeticio de 3
-		
 		beq .L_buclerandom			@;torna a repetir el bucle si forma repeticio
 		
 		@;si no forma cap repeticio, anem a la seguent posicio
