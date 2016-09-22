@@ -41,75 +41,76 @@
 @;			'cuenta_repeticiones' (ver fichero "candy1_move.s")
 @;	Parámetros:
 @;		R0 = dirección base de la matriz de juego
-@;		R1 = número de mapa de configuración
+@;		R1 = número de mapa de configuración  ---> indice de fila
+
 @;		R2 = indice columna
-@;		R3 = indice fila
+@;		R3 = backup numero del numero de mapa de configuracion
 @;		R4 = backup de la direccion base se la matriz
-@;		R5 = total columnas
+@;		R5 = valor casella + valor random --> guardar matriu de joc
 @;		R6 = puntero
 @;		R7 = mapas
 @;		R8 = valor casilla
-@;		R9 = temporal
+
 	.global inicializa_matriz
 inicializa_matriz:
-		push {r1-r9, lr}			@;guardar registros utilizados
+		push {r0-r8, lr}			@;guardar registros utilizados
 		
-		mov r4, r0			@;backup de la direccion base de la matriz
+		mov r4, r0					@;backup de la direccion base de la matriz
+		mov r3, r1					@;backup del numero de mapa de configuracio
 		
-		ldr r7, =mapas		@;carreguem els mapes
-		mov r5, #COLUMNS	
-		mov r3, #ROWS
-		mul r8, r5,r3		@;multipliquem files per columnes
-		mul r8, r1			@;passem el numero de mapa de configuracio
-		add r7, r8			@;accedim al mapa
+		ldr r7, =mapas				@;carreguem els mapes
+		mov r5, #COLUMNS			@;total columnes a r5 
+		mov r1, #ROWS				@;total files a r1
+		mul r8, r5, r1				@;multipliquem files per columnes
+		mul r8, r3					@;passem el numero de mapa de configuracio
+		add r7, r8					@;accedim al mapa
 		
-		mov r6, #0			@;inicializamos puntero
-		mov r3, #0			@;inicializamos filas
+		mov r6, #0					@;inicializamos puntero
+		mov r1, #0					@;inicializamos filas
 	.L_buclefilas:
-		mov r2, #0			@;inicializamos columnas
+		mov r2, #0					@;inicializamos columnas
 	.L_buclecol:
-		ldrb r8, [r4, r6]	@;R8 = valor casilla (r3, r2)
+		ldrb r8, [r7, r6]			@;R8 = valor casilla (r1, r2)
 		
-		
-		cmp r8, #0			@;comparamos con objeto variable
-		beq	.L_buclerandom		@;si es variable saltamos al bucle random
+		cmp r8, #0					@;comparamos con objeto variable
+		beq	.L_buclerandom			@;si es variable saltamos al bucle random
 		cmp r8, #8
 		beq .L_buclerandom
 		cmp r8, #16
 		beq .L_buclerandom
 		
-	.L_buclerandom:			@;bucle per asignar un numero aleatori, si forma un combinacio de 3, es busca un altre numero
-		mov r9, #0				@;netejem el temporal
-		mov r0, #6				@;li passem el maxim de rang aleatori
-		bl mod_random			@;cridem a la funcio random
-		add r0, #1				@;li sumem 1 per a que no surti cap 0
-		add r9, r8, r0			@;al temporal r8 guardo el valor de la seva posicio mes el valor random que hem obtingut
-		mov r0, r4				@;recuperem la direccio base per passar-li al cuenta_repeticiones
-		mov r1, r3				@;guardem el valor de les files a r1 per passar-li a la rutina (ja tenim les columnes a r2)
-		mov r3, #2				@;i li passem la direccio (oest) a r3
+		b .L_final					@;si es un objecte fixe, passem a la seguent casella
+		
+	.L_buclerandom:					@;bucle per asignar un numero aleatori, si forma un combinacio de 3, es busca un altre numero
+		mov r5, #0					@;netegem el temporal
+		mov r0, #6					@;li passem el maxim de rang aleatori
+		bl mod_random				@;cridem a la funcio random
+		add r0, #1					@;li sumem 1 per a que no surti cap 0
+		add r5, r8, r0				@;al temporal r5 guardo el valor de la seva posicio mes el valor random que hem obtingut
+		mov r0, r4					@;recuperem la direccio base per passar-li al cuenta_repeticiones
+		mov r3, #2					@;i li passem la direccio (oest) a r3
+		strb r5, [r4, r6]			@;copio a la matriu de joc
 		bl cuenta_repeticiones	
-		cmp r0, #3				@;comprovar que no formi una repeticio de 3
-		mov r3, r1				@;recuperem el valor de les files al seu registre
-		beq .L_buclerandom			@;torna a repetir el bucle si forma repeticio
+		cmp r0, #3					@;comprovar que no formi una repeticio de 3
+		bge .L_buclerandom			@;torna a repetir el bucle si forma repeticio
 		@;ara fem el mateix pero per la direcico nord
-		mov r1, r3				@;guardem el valor de les files a r1 per passar-li a la rutina (ja tenim les columnes a r2)
-		mov r3, #3				@;i li passem la direccio (nord) a r3
-		bl cuenta_repeticiones	
-		cmp r0, #3				@;comprovar que no formi una repeticio de 3
-		mov r3, r1				@;recuperem el valor de les files al seu registre
-		beq .L_buclerandom			@;torna a repetir el bucle si forma repeticio
-		
+		mov r0, r4					@;tornem a posar a r0 la direccio base
+		mov r3, #3					@;i li passem la direccio (nord) a r3
+		bl cuenta_repeticiones	 
+		cmp r0, #3					@;comprovar que no formi una repeticio de 3
+		bge .L_buclerandom			@;torna a repetir el bucle si forma repeticio
+	.L_final:
 		@;si no forma cap repeticio, anem a la seguent posicio
-		add r6, #1			@;avanza posicion
-		add r2, #1			@;avanza columna
-		cmp r2, #COLUMNS	@;comprueba que no sea el final de la fila
-		blo .L_buclecol		@;sino esta al final, avanza al siguiente elemento
+		add r6, #1					@;avanza posicion
+		add r2, #1					@;avanza columna
+		cmp r2, #COLUMNS			@;comprueba que no sea el final de la fila
+		blo .L_buclecol				@;sino esta al final, avanza al siguiente elemento
 		@;si esta al final de columna:
-		add r3, #1			@;avanza fila
-		cmp r3, #ROWS		@;comprueba que no sea el final de columna
-		blo .L_buclefilas	@;si no esta al final, avanza al siguiente elemento
+		add r1, #1					@;avanza fila
+		cmp r1, #ROWS				@;comprueba que no sea el final de columna
+		blo .L_buclefilas			@;si no esta al final, avanza al siguiente elemento
 		
-		pop {r1-r9, pc}			@;recuperar registros y volver
+		pop {r0-r8, pc}				@;recuperar registros y volver
 
 
 

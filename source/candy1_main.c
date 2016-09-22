@@ -42,8 +42,8 @@ void actualizar_contadores(int code)
 	if (code & 4) printf("\x1b[38m\x1b[1;28H %d ", movements);
 	if (code & 8) printf("\x1b[37m\x1b[2;28H %d ", gelees);
 }
-
-
+ 
+ 
 
 /* Programa principal: control general del juego */
 int main(void)
