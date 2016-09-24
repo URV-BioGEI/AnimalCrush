@@ -159,7 +159,7 @@ baja_elementos:
 @;		r2 = columna
 @;		r3 = apuntador de posicio actual
 @;		r4 = direccio base matriu de joc
-@;		r5 = bits de menys pes de l'element actual
+@;		r5 = temporal
 @;		r6 = apuntador de posicio en un tractament
 @;		r8 = contingut de la posicio a tractar (sera 0, 8 o 16)
 @;		r9 = Codi de tipus de la gelatina
@@ -176,35 +176,30 @@ baja_verticales:
 		.whilemove: 				
 		ldrb r8, [r3]					@;Carreguem a r8 el contingut de la posicio actual
 		cmp r1, #1						@;Mira si es la primera fila				
-		beq .primerafila
+		beq .primerafila				@;tracta primera fila
 		.segueix:
 		and r11, r8, #7					@;Netegem bits de tipus
 		cmp r11, #0						@;Comparem bits de menys pes amb 0
 		bne .notractes					@;Salta al final del while si l'element no es buit (passem a la seguent cel.la)
-		cmp r1, #1						@;Comparar fila amb 0, si  es 0 llavors podem generar l'element
-		bne .tractar					@;Sino tractem l'element com qualsevol altre
-		beq .aleatori
-		@;SECCIO ALEATORI (ELEMENTS A 0 PRIMERA FILA)
+		b .tractar						@;Sino tractem l'element 
+		@;SECCIO PRIMERA FILA (ELEMENTS A 0 PRIMERA FILA)
 		.primerafila:
-		cmp r8, #15						@;Comparem amb 15
-		bne .segueix					@;Segueix revisant si no es un 15 (funcionament normal)
 		mov r7, r3						@;Guardem la posicio en la que estem
 		.bucle:
-		add r7, #COLUMNS				@;Desplacem cap a baix
+		cmp r8, #15						@;Comparem amb 15
+		addeq r7, #COLUMNS				@;Desplacem cap a baix
 		ldrb r8, [r7]					@;Carreguem contingut de la posicio de mes avall
 		cmp r8, #15						@;Compara amb 15
 		beq .bucle						@;Segueix baixant si trobes 15
-		add r7, #COLUMNS				@;Desplacem cap a baix
-		ldrb r8, [r7]
 		and r11, r8, #7					@;corregeix bits
 		cmp r11, #0						@;Compara amb 0
 		bne .notractes					@;si no es element buit surt...
-		.aleatori:
+		.aleatori:						@;I sino hauras de generar nun aleatori
 		mov r0, #6						@;Li passem un 6 a la rutina mod random
 		bl mod_random					@;Cridem mod random (genera aleatori entre 0 i 5)
 		add r0, #1						@;Sumem 1 per a corregir 
-		add r8, r0
-		strb r8, [r3]					@;Guardem l'element generat a la posicio que li toca
+		add r8, r0						@;Sumem la gelatina que hi havia (que sera 0, 8 o 16) al aleatori corresponent
+		strb r8, [r7]					@;Guardem l'element generat a la posicio que li toca
 		mov r10, #1						@;Sortida de parametres
 		b .notractes					@;Sortim d'aquesta seccio per a avançar
 		@;SECCIO ELEMENT BUIT
@@ -217,25 +212,18 @@ baja_verticales:
 		beq .whiletractar				@;...pugem una casella mes
 		cmp r8, #7						@;Mirem si hi ha un bloc fixe
 		beq .notractes					@;I sortim si n'hi ha un
-		cmp r8, #0						@;Si es un altre 0 llavors... 
+		and r9, r8, #7					@;mascara de bits
+		cmp r9, #0						@;Si es un element buit llavors... 
 		beq .notractes					@;...sortim
-		and r5, r8, #7					@;Filtrem els bits de tipus
-		sub r9, r8, r5					@;A la casella superior li treiem els bits de tipus
-		strb r9, [r6]					@;Guarda els bits de gelatina a la posicio on era (hem eliminat els de tipus) per tant quedara a 0, 8 o 16
-		.Baixa:
-		add r6, #COLUMNS				@;Baixem a la casella de baix
-		ldrb r11, [r6]					@;Carreguem a r11 l'element inmediatament inferior 
-		cmp r11, #15					@;Si hi ha un forat al cami
-		beq .Baixa						@;Baixa un altre
-		@;Per la manera en com estem tractant les dades cal dir que no cal comprovar si l'element
-		@;inferior es un bloc fix, o ens sortim de la matriu o qualsevol altre cas excepcional
-		@;L'únic que podem trobar es un 0 un 8 o un 16
-		add r11, r5						@;Sumem els bits de tipus amb el contingut de la posicio actual de la matriu
-		strb r11, [r6]					@;Guardem a la posicio de la matriu
+		sub r12, r8, r9					@;i sino a la casella superior li treiem els bits de tipus
+		strb r12, [r6]					@;Guarda els bits de gelatina a la posicio on era (hem eliminat els de tipus) per tant quedara a 0, 8 o 16
+		ldrb r11, [r3]					@;Carreguem a r11 gelatina a tractar que sera 0, 8 o 16
+		add r5, r11, r9					@;Suma bits de la casella a tractar mes el tipus de la que baixa
+		strb r5, [r3]					@;Guardaho a la casella tractada (la inferior)
 		mov r10, #1						@;Hem fet moviment per tant...
 		@;SECCIO AVANÇAR/TRACTAMENT D'INDEX
 		.notractes:
-		sub r3, r3, #1						@;Restem 1, com que les matrius en ARM són en realitat taules podem desplaçarnos restant 1 fins que l'element actual sigui la posicio base de la matriu
+		sub r3, r3, #1					@;Restem 1, com que les matrius en ARM són en realitat taules podem desplaçarnos restant 1 fins que l'element actual sigui la posicio base de la matriu
 		cmp r2, #1						@;Comprovem que l'index de columna no ha arribat a 1
 		bne .canvicolumna				@;Si no ha arribat a 1 canvia la columna
 		cmp r1, #1						@;si ha arribat a 1, Comparo fila amb 1
