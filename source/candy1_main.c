@@ -74,7 +74,7 @@ int main(void)
 		if (initializing)		//////	SECCIÓN DE INICIALIZACIÓN	//////
 		{
 			//inicializa_matriz(matrix, level);
-			copia_mapa(matrix, 3);
+			copia_mapa(matrix, 4);
 			escribe_matriz(matrix);
 			repeticiones=cuenta_repeticiones(matrix, f, c, ori);
 			retardo(5);
