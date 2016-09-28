@@ -132,12 +132,93 @@ inicializa_matriz:
 @;			con combinaciones
 @;	Parámetros:
 @;		R0 = dirección base de la matriz de juego
+
+@;		R1 = índice de fila
+@;		R2 = índice de columna
+@;		R3 = valor casella matriu de joc
+@;		R4 = backup de la direccion base de la matriz
+@;		R5 = temporal
+@;		R6 = puntero
+@;		R7 = mat_recomb1
+@;		R8 = mat_recomb2
 	.global recombina_elementos
 recombina_elementos:
-		push {lr}
+		push {r0-r8, lr}
+		
+		mov r4, r0					@;backup de la direccio base de la matriu
+		ldr r7, =mat_recomb1		@;carreguem mat_recomb1
+		ldr r8, =mat_recomb2		@;carreguem mat_recomb2
+		@;recorrer matriu de joc:
+		
+	.L_inicialMJOC:
+		
+		mov r6, #0					@;inicializamos puntero
+		mov r1, #0					@;inicializamos filas
+	.L_buclefilasMJOC:
+		mov r2, #0					@;inicializamos columnas
+		mov r3, #COLUMNS			@;guardem al temporal r3 el maxim de columnes
+		mul r3, r1, r3				@;r3=index files x columnes
+	.L_buclecolMJOC:
+		add r6, r3, r2				@;preparamos puntero
+		ldrb r3, [r4, r6]			@;R3 = valor casilla (r1, r2) matriu de joc
+		
+		cmp r3, #0					@;si es un espai buit
+		beq .L_copiar2				@;el copiem directament a mat_recomb2
+		cmp r3, #7					@;si es un bloc solid
+		beq .L_copiar2				@;el copiem directament a mat_recomb2 i a mat_recomb1
+		cmp r3, #15					@;si es un hueco
+		beq .L_copiar2				@;el copiem directament a mat_recomb2 i a mat_recomb1
+		
+		mov r5, r3, lsr#3			@;movem al temporal el valor dels dos primers bits de la casella (els bits de tipus)
+		and r5, #0x03				@;fem una màscara per a poder comparar directament els dos bits
+		cmp r5, #8					@;comparem amb una gelatina simple
+		beq .L_gelsimple			@;si es simple ho portem al bucle corresponent
+		cmp r5, #16					@;comparem amb una gelatina doble
+		beq .L_geldoble				@;si es doble ho portem al bucle corresponent
+		
+	.L_gelsimple:		@;bucle per passar les gelatines simples a mat_recomb1 i mat_recomb2
+		mov r5, #8					@;li possem el seu codi base
+		strb r7, [r5, r6]			@;passem el codi base de la gelatina simple, en la mateixa posicio, a mat_recomb1
+		strb r8, [r5, r6]			@;passem el codi base de la gelatina simple, en la mateixa posicio, a mat_recomb2
+		b .L_finalMJOC				@;una vegada finalitza va al bucle final per seguir recorrent la matriu de joc
+		
+	
+	.L_geldoble:		@;bucle per passar les gelatines dobles a mat_recomb1 i mat_recomb2
+		mov r5, #16					@;li possem el codi base
+		strb r7, [r5, r6]			@;passem el codi base de la gelatina doble, en la mateixa posicio, a mat_recomb1
+		strb r8, [r5, r6]			@;passem el codi base de la gelatina doble, en la mateixa posicio, a mat_recomb2
+		b .L_finalMJOC				@;una vegada finalitza va al bucle final per seguir recorrent la matriu de joc 
+		
+	.L_copiar2:			@;bucle per a copiar directament a mat_recomb2
+		strb r8, [r3, r6]			@;copio el valor de la matriu de joc a mat_recomb2
+		mov r3, #0					@;canviem el valor de un bloc solid (7) o un hueco(15) a 0
+		strb r7, [r3, r6]			@;guardem a la mat_recomb1 un 0 en la posicio del bloc solid/hueco
+		
+	.L_finalMJOC:
+		@;si no forma cap repeticio, anem a la seguent posicio
+		add r6, #1					@;avanza posicion
+		add r2, #1					@;avanza columna
+		cmp r2, #COLUMNS			@;comprueba que no sea el final de la fila
+		blo .L_buclecolMJOC			@;sino esta al final, avanza al siguiente elemento
+		@;si esta al final de columna:
+		add r1, #1					@;avanza fila
+		cmp r1, #ROWS				@;comprueba que no sea el final de columna
+		blo .L_buclefilasMJOC		@;si no esta al final, avanza al siguiente elemento
+		
+	.L_inicialRECOMB2:
+		
+		@;generar casella aleatoria per a mat_recomb1
+		mov r0, #COLUMNS			@;li passem a mod_random el limit del nombre de columnes
+		bl mod_random				@;generem un numero de columna aleatori
+		mov r3, r0					@;r3=valor columna random
+		@;idem per les files
+		mov r0, #ROWS				@;li passem a mod_random el limit del nombre de columnes
+		bl mod_random				@;generem un numero de columna aleatori
+		mov r5, r0					@;r5=valor fila random
+		@;casella random = r3,r5
 		
 		
-		pop {pc}
+		pop {r0-r8, pc}
 
 
 
