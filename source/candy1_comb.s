@@ -1,7 +1,7 @@
 @;=                                                               		=
 @;=== candy1_combi.s: rutinas para detectar y sugerir combinaciones   ===
 @;=                                                               		=
-@;=== Programador tarea 1G: eeex.xxx@estudiants.urv.cat				  ===
+@;=== Programador tarea 1G: xxx.xxx@estudiants.urv.cat				  ===
 @;=== Programador tarea 1H: yyy.yyy@estudiants.urv.cat				  ===
 @;=                                                             	 	=
 
@@ -28,10 +28,130 @@
 @;		R0 = 1 si hay una secuencia, 0 en otro caso
 	.global hay_combinacion
 hay_combinacion:
-		push {lr}
-		
-		
-		pop {pc}
+		push {r1-r12,lr}
+				mov r4, r0						;@*Moviment horitzontal guardar direcio base
+				mov r3, #ROWS					;@dim de files
+				mov r12, #COLUMNS				;@dim de columnes
+				mov r0, #0						;@variable que controla si s'ha trobat una combinacio
+				mov r1, #0						;@r1=files , inicialitza a 0 per fer totes les files en el mov. hor
+				mov r2, #0						;@r2=columnes,
+				sub r12, #1						;@c<columns-1
+			.Lwhilef1:
+				cmp r1, r3						;@comprovar condicio f<rows === es  igual a aixo f<rows?????
+				bge .Lfinwhilef1				;@saltar a final del while de files
+				cmp r0, #6						;@comprovar que no s'hagi trobat ja una combinacio
+				beq .Lfi
+				.Lwhilec1:
+					cmp r2, r12
+					bge .Lfinwhilec1
+					cmp r0, #6
+					beq .Lfinwhilec1
+					mul r5, r1 ,r3
+					add r5, r2					;@r5=desplaçament(rows*f+c)
+					ldrb r6, [r4, r5]			;@r6= tipus de gelatina actual
+					cmp r6, #0
+					beq .Lif1
+					cmp r6, #7
+					beq .Lif1
+					cmp r6, #15
+					beq .Lif1					;@comparacio amb llocs especials
+					add r5, #1
+					ldrb r8, [r4, r5]			;@r8= tipus gelatina seguent			
+					and r7, r6, #0x00000007		;@r7 mascara per comparar el bits de les gelatines (gelatina actual)
+					and r11, r8, #0x00000007	;@r11=mascara per comparar (gelatina seguent)
+					cmp r7, r11
+					beq .Lgeligual
+					cmp r8, #0
+					beq .Lif1
+					cmp r8, #7
+					beq .Lif1
+					cmp r8, #15
+					beq .Lif1	 				;@comparacio amb gelatina seguent amb llocs especials
+					strb r6, [r4, r5]			;@mov de gelatina actual a r9=actual
+					sub r5, #1					;@mov de gelatina seguent a r10=seguent
+					strb r8, [r4, r5]
+					.Lgeligual:
+					bl detectar_orientacion
+					cmp r0, #6
+					bne .Lfi					;@si e trobat combinacio ves al final
+					add r2, #1					;@c+1
+					bl detectar_orientacion
+					sub r2, #1
+					cmp r0, #6
+					bne .Lfi					;@si e trobat combinacio ves al final
+					.Lif1:
+					add r2, #1
+					b .Lwhilec1
+				.Lfinwhilec1:
+				add r1, #1
+				b .Lwhilef1
+			.Lfinwhilef1:	
+				mov r1, #0						;@!*Moviment vertical*! r1=files , inicialitza a 0 per fer totes les files en el mov. hor
+				mov r2, #0						;@r2=columnes, r1=files 
+				mov r3, #ROWS					;@dim de files
+				mov r12, #COLUMNS				;@dim de columnes
+				add r12, #1	
+				sub r3, #1						;@c<rows-1
+			.Lwhilef2:
+				cmp r1, r3						;@comprovar condicio f<rows === es  igual a aixo f<rows?????
+				bge .Lfinwhilef2				;@saltar a final del while de files
+				cmp r0, #6						;@comprovar que no s'hagi trobat ja una combinacio
+				bne .Lfi
+				.Lwhilec2:
+					cmp r2, r12
+					bge .Lfinwhilec2
+					cmp r0, #6
+					bne .Lfinwhilec2
+					mul r5, r1 ,r3
+					add r5, r2					;@r5=desplaçament(rows*f+c)
+					ldrb r6, [r4, r5]			;@r6= tipus de gelatina actual
+					cmp r6, #0
+					beq .Lif2
+					cmp r6, #7
+					beq .Lif2
+					cmp r6, #15
+					beq .Lif2					;@comparacio amb llocs especials
+					add r5, r3					;@+row al desplaçament per anar a la seguent fila
+					ldrb r8, [r4, r5]			;@!*comença punt 3*! r8= tipus gelatina seguent			
+					and r7, r6, #0x00000007		;@r7 mascara per comparar el bits de les gelatines (gelatina actual)
+					and r11, r8, #0x00000007	;@r11=mascara per comparar (gelatina seguent)
+					cmp r7, r11
+					beq .Lgeligual2
+					cmp r8, #0
+					beq .Lif2
+					cmp r8, #7
+					beq .Lif2
+					cmp r8, #15
+					beq .Lif2	 				;@comparacio amb gelatina seguent amb llocs especials		strb r6, [r4, r5]	,mov r9, r6
+					strb r6, [r4, r5]					;@mov de gelatina actual a r9=actual				sub r5,r3			,mov r10, r8	
+					sub r5, r3					;@mov de gelatina seguent a r10=seguent						strb r8, [r4, r5]	,mov r6, r10
+					strb r8, [r4, r5]			;@																			,mov r8, r9
+					.Lgeligual2:
+					bl detectar_orientacion		;@
+					cmp r0, #6
+					bne .Lfi					;@si e trobat combinacio ves al final
+					add r1, #1					;@f+1
+					bl detectar_orientacion
+					sub r1, #1
+					cmp r0, #6
+					bne .Lfi					;@si e trobat combinacio ves al final
+					.Lif2:
+					add r2, #1
+					b .Lwhilec2
+				.Lfinwhilec2:
+				add r1, #1
+				b .Lwhilef2
+			.Lfinwhilef2:	
+			
+		.Lfi:									;@final final 
+		cmp r0, #6
+		beq .Lcanv
+		mov r0, #1
+		b .Lfinal
+		.Lcanv:
+		mov r0, #0
+		.Lfinal:
+		pop {r1-r12,pc}
 
 
 
@@ -116,8 +236,41 @@ generar_posiciones:
 @;				sin secuencia: 6 
 detectar_orientacion:
 		push {r3,r5,lr}
-		
-		
+		mov r5, #0				@;R5 = índice bucle de orientaciones
+		mov r0, #4
+		bl mod_random
+		mov r3, r0				@;R3 = orientación aleatoria (0..3)
+	.Ldetori_for:
+		mov r0, r4
+		bl cuenta_repeticiones
+		cmp r0, #1
+		beq .Ldetori_cont		@;no hay inicio de secuencia
+		cmp r0, #3
+		bhs .Ldetori_fin		@;hay inicio de secuencia
+		add r3, #2
+		and r3, #3				@;R3 = salta dos orientaciones (módulo 4)
+		mov r0, r4
+		bl cuenta_repeticiones
+		add r3, #2
+		and r3, #3				@;restituye orientación (módulo 4)
+		cmp r0, #1
+		beq .Ldetori_cont		@;no hay continuación de secuencia
+		tst r3, #1
+		bne .Ldetori_vert
+		mov r3, #4				@;detección secuencia horizontal
+		b .Ldetori_fin
+	.Ldetori_vert:
+		mov r3, #5				@;detección secuencia vertical
+		b .Ldetori_fin
+	.Ldetori_cont:
+		add r3, #1
+		and r3, #3				@;R3 = siguiente orientación (módulo 4)
+		add r5, #1
+		cmp r5, #4
+		blo .Ldetori_for		@;repetir 4 veces
+		mov r3, #6				@;marca de no encontrada
+	.Ldetori_fin:
+		mov r0, r3				@;devuelve orientación o marca de no encontrada
 		pop {r3,r5,pc}
 
 

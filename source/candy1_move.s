@@ -1,8 +1,8 @@
 @;=                                                         	      	=
 @;=== candy1_move: rutinas para contar repeticiones y bajar elementos ===
 @;=                                                          			=
-@;=== Programador tarea 1E: Aleix.marine@estudiants.urv.cat			  ===
-@;=== Programador tarea 1F: Aleix.marine@estudiants.urv.cat			  ===
+@;=== Programador tarea 1E: xxx.xxx@estudiants.urv.cat				  ===
+@;=== Programador tarea 1F: yyy.yyy@estudiants.urv.cat				  ===
 @;=                                                         	      	=
 
 
@@ -37,15 +37,9 @@
 @;		R3 = orientación 'ori' (0 -> Este, 1 -> Sur, 2 -> Oeste, 3 -> Norte)
 @;	Resultado:
 @;		R0 = número de repeticiones detectadas (mínimo 1)
-@;  Variables associades a registres:
-@;  	r4 = repeticions de l'element
-@;		r5 = tres bits de menys pes del primer element
-@;		r6 = Apuntador-> matriu + (i*COLUMNS+j)
-@;		r7 = tres bits de menys pes de l'element actual
-
 	.global cuenta_repeticiones
 cuenta_repeticiones:
-		push {r4-r10,lr}
+		push {r1-r10,lr}
 		@;Seccio ENTRADA
 		mov r4, #1 					@;r4: repeticions de l'element=1
 		mov r10, #COLUMNS 			@;r10 registre temporal per a guardar el valor de la constant COLUMNS
@@ -112,9 +106,7 @@ cuenta_repeticiones:
 		@;Seccio EXIT El programa sempre acabara aqui, per tant fem les operacions pertinents de sortida
 		.Exit:
 		mov r0, r4
-		pop {r4-r10, pc}
-
-
+		pop {r1-r10, pc}	
 
 @;TAREA 1F;
 @; baja_elementos(*matriz): rutina para bajar elementos hacia las posiciones
@@ -150,18 +142,9 @@ baja_elementos:
 @;		R4 = dirección base de la matriz de juego
 @;	Resultado:
 @;		R0 = 1 indica que se ha realizado algún movimiento. 
-@;	Variables associades a registres
-@;		r1 = fila
-@;		r2 = columna
-@;		r3 = apuntador de posicio actual
-@;		r4 = direccio base
-@;		r5 = bits de menys pes de l'element actual
-@;		r6 = apuntador de posicio inicial en un tractament
-@;		r7 = apuntador de fila en un tractament
-@;		r8 = contingut de la posicio a tractar (sera 0, 8 o 16)
-@; 		r10 = emmagatzema si hi ha hagut moviments (r0 esta en ús tota l'estona per mod random)
 baja_verticales:
 		push {lr}
+		
 		
 		pop {pc}
 

@@ -25,7 +25,7 @@ int level = 0;					// nivel del juego (nivel inicial = 0)
 int points;						// contador global de puntos
 int movements;					// número de movimientos restantes
 int gelees;						// número de gelatinas restantes
-
+int comb;
 
 
 /* actualizar_contadores(code): actualiza los contadores que se indican con el
@@ -37,7 +37,7 @@ int gelees;						// número de gelatinas restantes
 		bit 3:	gelatinas  */
 void actualizar_contadores(int code)
 {
-	if (code & 1) printf("\x1b[38m\x1b[1;8H %d", level);
+	if (code & 1) printf("\x1b[38m\x1b[1;8H %d", comb);
 	if (code & 2) printf("\x1b[39m\x1b[2;8H %d  ", points);
 	if (code & 4) printf("\x1b[38m\x1b[1;28H %d ", movements);
 	if (code & 8) printf("\x1b[37m\x1b[2;28H %d ", gelees);
@@ -53,10 +53,11 @@ int main(void)
 	int falling = 0;			// =1 indica que los elementos estan bajando
 	int initializing = 1;		// =1 indica que hay que inicializar un juego
 	int mX, mY, dX, dY;			// variables de detección de pulsaciones
-
+	
+ 
 	seed32 = time(NULL);		// fijar semilla de números aleatorios
 	consoleDemoInit();			// inicialización de pantalla de texto
-	printf("candyNDS (version 1: texto)\n");
+	printf("candyNDS (version 1: text(%d)to)\n",comb);
 	printf("\x1b[38m\x1b[1;0H  nivel:");
 	printf("\x1b[39m\x1b[2;0H puntos:");
 	printf("\x1b[38m\x1b[1;15H movimientos:");
@@ -67,9 +68,10 @@ int main(void)
 	{
 		if (initializing)		//////	SECCIÓN DE INICIALIZACIÓN	//////
 		{
-			inicializa_matriz(matrix, level);
-			//copia_mapa(matrix, 8);
+			//inicializa_matriz(matrix, level);
+			copia_mapa(matrix, 5);
 			escribe_matriz(matrix);
+			comb = hay_combinacion(matrix);
 			retardo(5);
 			initializing = 0;
 			falling = 0;
