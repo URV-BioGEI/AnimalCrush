@@ -42,7 +42,7 @@
 @;	Parámetros:
 @;		R0 = dirección base de la matriz de juego
 @;		R1 = número de mapa de configuración  ---> indice de fila
-
+@;	Registres:
 @;		R2 = indice columna
 @;		R3 = backup numero del numero de mapa de configuracion
 @;		R4 = backup de la direccion base se la matriz
@@ -132,18 +132,21 @@ inicializa_matriz:
 @;			con combinaciones
 @;	Parámetros:
 @;		R0 = dirección base de la matriz de juego
-
+@;	Regitres:
 @;		R1 = índice de fila
 @;		R2 = índice de columna
-@;		R3 = valor casella matriu de joc
+@;		R3 = valor casella matriu
 @;		R4 = backup de la direccion base de la matriz
 @;		R5 = temporal
 @;		R6 = puntero
 @;		R7 = mat_recomb1
 @;		R8 = mat_recomb2
+@;		R9 = contador de iteracions
+@;		R10= puntero per saber la posicio aleatoria de mat_recomb1 creada
+@;		R11= temporal
 	.global recombina_elementos
 recombina_elementos:
-		push {r0-r8, lr}
+		push {r0-r11, lr}
 		
 		mov r4, r0					@;backup de la direccio base de la matriu
 		ldr r7, =mat_recomb1		@;carreguem mat_recomb1
@@ -207,18 +210,99 @@ recombina_elementos:
 		
 	.L_inicialRECOMB2:
 		
-		@;generar casella aleatoria per a mat_recomb1
+		mov r6, #0					@;inicializamos puntero
+		mov r1, #0					@;inicializamos filas
+	.L_buclefilasRECOMB2:
+		mov r2, #0					@;inicializamos columnas
+		mov r3, #COLUMNS			@;guardem al temporal r3 el maxim de columnes
+		mul r3, r1, r3				@;r3=index files x columnes
+	.L_buclecolRECOMB2:
+		add r6, r3, r2				@;preparamos puntero
+		ldrb r3, [r8, r6]			@;R3 = valor casilla (r1, r2) mat_recomb2
+		
+	@;caselles que requereixen codi:
+		cmp r3, #0					@;comparem el valor de la casella amb un element base
+		beq .L_casellarandom		@;buscarem un codi de la mat_recomb1
+		cmp r3, #8					@;comparem el valor de la casella amb una gelatina simple
+		beq .L_casellarandom		@;buscarem un codi de la mat_recomb1
+		cmp r3, #16					@;comparem el valor de la casella amb una gelatina dobles
+		beq .L_casellarandom		@;buscarem un codi de la mat_recomb1
+		
+		mov r9, #0					@;inicialitzem el contador de interacions, per si un cas es queda en bucle infinit
+	.L_casellarandom:
 		mov r0, #COLUMNS			@;li passem a mod_random el limit del nombre de columnes
 		bl mod_random				@;generem un numero de columna aleatori
-		mov r3, r0					@;r3=valor columna random
+		mov r11, r0					@;r11=valor columna random
 		@;idem per les files
-		mov r0, #ROWS				@;li passem a mod_random el limit del nombre de columnes
-		bl mod_random				@;generem un numero de columna aleatori
+		mov r0, #ROWS				@;li passem a mod_random el limit del nombre de files
+		bl mod_random				@;generem un numero de fila aleatori
 		mov r5, r0					@;r5=valor fila random
-		@;casella random = r3,r5
+		mov r0, #COLUMNS			@;fem servir r0 de temporal per guardar el total de columnes
+		mla r10, r5, r0, r11		@;r10 = (index fila*columna)+index columna
+		ldrb r5, [r7, r10]			@;r5 = valor de mat_recomb1 a la casella aleatoria
+	@;hem de sumar el contador abans de tornar a començar el bucle (en cas de que trobem un 0)
+		add r9, #1					@;sumem 1 al contador
+		cmp r9, #99				@;posem un maxim de iteracions
+		beq .L_FINAL				@;terminem el programa si fa masses iteracions (anem directament al final ja que voldra dir que no queden caselles de codi)
 		
+		cmp r5, #0					@;comparem la casella aleatoria amb 0 (element ja usat)
+		beq .L_casellarandom		@;si ja esta usada anem a buscar una altra
+		add r5, r3					@;si no esta usada afegim el valor random al codi base
+		strb r5, [r8, r6]			@;carreguem el valor random (r5) a mat_recomb2 en la posicio del puntero r6
+		mov  r0, r8					@;passem la direccio base de la matriu
+		mov r11, r3					@;salvem el valor de r3 al temporal
+		mov r3, #2					@;li passem la direccio oest
+		bl cuenta_repeticiones		@;anem al cuenta_repeticiones
+		mov r3, r11					@;recuperem el valor de r3
+		cmp r0, #3					@;comparem amb 3 repeticions
+		bge .L_casellarandom		@;tornem a buscar un altre casella random en cas de que trobem una secuencia
+		mov r3, #0					@;guardem al temporal 0
+		strb r3, [r7, r6]			@;una vez comprobamos que no hay combinacion, guardamos un 0 en la mat_recomb1
 		
-		pop {r0-r8, pc}
+	.L_finalRECOMB2:
+		@;si no forma cap repeticio, anem a la seguent posicio
+		add r6, #1					@;avanza posicion
+		add r2, #1					@;avanza columna
+		cmp r2, #COLUMNS			@;comprueba que no sea el final de la fila
+		blo .L_buclecolRECOMB2		@;sino esta al final, avanza al siguiente elemento
+		@;si esta al final de columna:
+		add r1, #1					@;avanza fila
+		cmp r1, #ROWS				@;comprueba que no sea el final de columna
+		blo .L_buclefilasRECOMB2	@;si no esta al final, avanza al siguiente elemento
+		
+	.L_FINAL:
+	
+		mov r0, r8					@;passem la direccio de la mat_recomb2
+		bl hay_combinacion			@;mirem si hi ha alguna combinacio posible
+		cmp r0, #0					@;en cas de que no hi hagi cap sequencia possible tornem a fer la funcio
+		beq .L_inicialMJOC
+	
+	@;una vegada tenim la mat_recomb2 finalitzada, la copiem a la matriu de joc
+	
+		mov r6, #0					@;inicializamos puntero
+		mov r1, #0					@;inicializamos filas
+	.L_buclefilasFIN:
+		mov r2, #0					@;inicializamos columnas
+		mov r3, #COLUMNS			@;guardem al temporal r3 el maxim de columnes
+		mul r3, r1, r3				@;r3=index files x columnes
+	.L_buclecolFIN:
+		add r6, r3, r2				@;preparamos puntero
+		ldrb r3, [r8, r6]			@;R3 = valor casilla (r1, r2) mat_recomb2
+		
+		strb r4, [r3, r6]			@;guardem a la matriu de joc el valor de mat_recomb2 a la mateixa posicio
+		
+	.L_finalFIN:
+		@;si no forma cap repeticio, anem a la seguent posicio
+		add r6, #1					@;avanza posicion
+		add r2, #1					@;avanza columna
+		cmp r2, #COLUMNS			@;comprueba que no sea el final de la fila
+		blo .L_buclecolFIN			@;sino esta al final, avanza al siguiente elemento
+		@;si esta al final de columna:
+		add r1, #1					@;avanza fila
+		cmp r1, #ROWS				@;comprueba que no sea el final de columna
+		blo .L_buclefilasFIN		@;si no esta al final, avanza al siguiente elemento
+		
+		pop {r0-r11, pc}
 
 
 
