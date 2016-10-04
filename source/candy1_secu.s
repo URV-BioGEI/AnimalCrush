@@ -80,6 +80,7 @@ hay_secuencia:
 				b .LwhileColum
 			.LfiwhileColum:
 			add r1, #1
+			mov r2, #0
 			b .LwhileFila
 		.LfiwhileFila:
 		mov r0, #1
@@ -104,7 +105,7 @@ hay_secuencia:
 @;		R1 = dirección de la matriz de marcas
 	.global elimina_secuencias
 elimina_secuencias:
-		push {r0-r11, lr}
+		push {r2-r11, lr}
 		mov r2, #0					@; R2: fila
 		mov r3, #0					@; R3: columna
 		mov r4, #ROWS				@; R4: rows
@@ -123,6 +124,7 @@ elimina_secuencias:
 				b .Lwcolumna
 			.Lwfinalcolumna:
 			add r2, #1
+			mov r3, #0
 			b .Lwfila
 		.Lwfinalfila:
 		bl marcar_horizontales
@@ -158,9 +160,10 @@ elimina_secuencias:
 				b .Lwcolumna2
 			.Lwfinalcolumna2:
 			add r2, #1
+			mov r3, #0
 			b .Lwfila2
 		.Lwfinalfila2:
-		pop {r0-r11, pc}
+		pop {r2-r11, pc}
 
 
 	
@@ -182,7 +185,7 @@ elimina_secuencias:
 @;		R0 = dirección base de la matriz de juego
 @;		R1 = dirección de la matriz de marcas
 marcar_horizontales:
-		push {r0-r12, lr}
+		push {r2-r12, lr}
 		mov r2, #0					@; R2: fila
 		mov r3, #0					@; R3: columna
 		mov r6, #ROWS				@; R6: rows
@@ -198,19 +201,31 @@ marcar_horizontales:
 				sub r10, r7, #1				@; R10: columna-1;
 				cmp r3, r10
 				bge .Lif23
+				mul r12, r2, r6				@; R12: fila per a coordena
+				add r11, r3, r12			@; R11: coordena matriz_marcas
+				ldrb r12, [r0, r11]			@; R12: veu que hi ha a la matriz_marcas en coordena R11
+				cmp r12, #7
+				beq .Lif23
+				cmp r12, #15				@; si a la casella hi ha un 7 o 15 saltem al final
+				beq .Lif23
 				mov r11, r1					@; R11: guardem matriz_marcas
 				mov r1, r2					@; R1: pasa a ser FILA
 				mov r2, r3					@; R2: pasa a ser COLUMNA
 				mov r3, #0					@; R3: pasa a ser l'orientacio de cuenta_repeticiones Este
-				mov r9, r0					@; R9: guardem matriz_base 
+				mov r12, r0					@; R12: guardem matriz_base 
 				bl cuenta_repeticiones		@; retorna a R0 número de repeticiones detectadas (mínimo 1)
 				mov r8, r0					@; R8: arreplega el valor retornat
-				mov r0, r9					@; R0: recupera matriz
+				mov r0, r12					@; R0: recupera matriz
 				mov r3, r2					@; R3: torna a ser COLUMNA
 				mov r2, r1					@; R2: torna a ser FILA
 				mov r1, r11					@; R1: torna a ser matriz_marcas
 				cmp r8, #3
 				blt .Lif23
+				mul r12, r2, r6				@; R12: fila per a coordena
+				add r11, r3, r12			@; R11: coordena matriz_marcas
+				ldrb r12, [r1, r11]			@; R12: veu que hi ha a la matriz_marcas en coordena R11
+				cmp r12, #0
+				bne .Lif23
 				add r9, #1					@; num_sec++;
 				.Lwhile8:
 					cmp r8, #0
@@ -226,11 +241,12 @@ marcar_horizontales:
 				b .LwhileColum23
 			.LfiwhileColum23:
 			add r2, #1
+			mov r3, #0
 			b .LwhileFila23
 		.LfiwhileFila23:
 		ldrb r12, =num_sec				@; R12: puntero a num_sec
 		strb r9, [r12]					@; guardem R9 a R12
-		pop {r0-r12, pc}
+		pop {r2-r12, pc}
 
 
 
@@ -252,13 +268,14 @@ marcar_horizontales:
 @;		R0 = dirección base de la matriz de juego
 @;		R1 = dirección de la matriz de marcas
 marcar_verticales:
-		push {r0-r12, lr}
+		push {r2-r12, lr}
 		mov r2, #0					@; R2: fila
 		mov r3, #0					@; R3: columna
 		mov r6, #ROWS				@; R6: rows
 		mov r7, #COLUMNS			@; R7: columns
 		mov r8, #0					@; R8: num_repeticions
-		ldrb r9, =num_sec			@; R9: num_sec
+		ldrb r12, =num_sec;
+		ldrb r9, [r12]				@; R9: num_sec
 		.LwhileFila69:
 			cmp r2, r6
 			bge .LfiwhileFila69
@@ -268,14 +285,21 @@ marcar_verticales:
 				sub r10, r6, #1				@; R10: fila-1;
 				cmp r2, r10
 				bge .Lfinwhile33
+				mul r12, r2, r6				@; R12: fila per a coordena
+				add r11, r3, r12			@; R11: coordena matriz_marcas
+				ldrb r12, [r0, r11]			@; R12: veu que hi ha a la matriz_marcas en coordena R11
+				cmp r12, #7
+				beq .Lfinwhile33
+				cmp r12, #15				@; si a la casella hi ha un 7 o 15 saltem al final
+				beq .Lfinwhile33
 				mov r11, r1					@; R11: guardem matriz_marcas
 				mov r1, r2					@; R1: pasa a ser FILA
 				mov r2, r3					@; R2: pasa a ser COLUMNA
 				mov r3, #1					@; R3: pasa a ser l'orientacio de cuenta_repeticiones Sur
-				mov r9, r0					@; R9: guardem matriz_base 
+				mov r12, r0					@; R12: guardem matriz_base 
 				bl cuenta_repeticiones		@; retorna a R0 número de repeticiones detectadas (mínimo 1)
 				mov r8, r0					@; R8: arreplega el valor retornat
-				mov r0, r9					@; R0: recupera matriz
+				mov r0, r12					@; R0: recupera matriz
 				mov r3, r2					@; R3: torna a ser COLUMNA
 				mov r2, r1					@; R2: torna a ser FILA
 				mov r1, r11					@; R1: torna a ser matriz_marcas
@@ -283,12 +307,14 @@ marcar_verticales:
 				blt .Lfinwhile33
 				mov r4, r8					@; R4: guarda num_rep
 				mov r5, #0					@; R5: combi (detecta si hi ha alguna combinació);
+				push {r4}					@; Lliberem registres
 				.Lwhileprova:
 					cmp r8, #0
 					beq .Lfinwhileprova
 					sub r8, #1				@; num_rep--;
 					mul r12, r2, r6			@; fila per a coordena
-					add r11, r12, r8
+					mul r4, r8, r6			@; num_rep per a coordena
+					add r11, r12, r4
 					add r11, r3				@; R11: coordena[f+num_rep-1][c];
 					ldrb r12, [r1, r11]		@; R12: llig que hi ha a la coordena R11 de la matriz_marcas
 					cmp r12, #0
@@ -299,6 +325,7 @@ marcar_verticales:
 					.Lif345:
 						b .Lwhileprova
 				.Lfinwhileprova:
+				pop {r4}
 				mov r8, r4					@; R8: recupera num_rep guardat anteriorment
 				mov r4, r11					@; R4: num_sec_horitzontal
 				cmp r5, #0
@@ -308,7 +335,8 @@ marcar_verticales:
 						beq .Lfinwhile33
 						sub r8, #1				@; num_rep--;
 						mul r12, r2, r6			@; R12: fila per a coordena
-						add r11, r12, r8
+						mul r5, r8, r6
+						add r11, r12, r5
 						add r11, r3				@; R11: coordena []f+num_rep-1][c];
 						strb r4, [r1, r11]		@; guarda R4 en la matriz de marca a al posició R11
 						b .Lwhilecombi
@@ -319,7 +347,8 @@ marcar_verticales:
 						beq .Lfinwhile33
 						sub r8, #1				@; num_repeticions--;
 						mul r12, r2, r6			@; R12: fila per a coordena
-						add r11, r12, r8
+						mul r5, r8, r6
+						add r11, r12, r5
 						add r11, r3				@; R11: coordena [f+num_rep-1][c];
 						strb r9, [r1, r11]		@; guarda R9 en la matriz de marca a la posició R11
 						b .Lwhile33
@@ -328,9 +357,10 @@ marcar_verticales:
 				b .LwhileColum69
 			.LfiwhileColum69:
 			add r2, #1
+			mov r3, #0
 			b .LwhileFila69
 		.LfiwhileFila69:
-		pop {r0-r12, pc}
+		pop {r2-r12, pc}
 
 
 
