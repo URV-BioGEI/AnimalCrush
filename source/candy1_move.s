@@ -132,14 +132,15 @@ cuenta_repeticiones:
 @;				queden movimientos pendientes. 
 	.global baja_elementos
 baja_elementos:
-		push {lr}
+		push {r4, lr}
 		mov r4, r0
-		@;bl baja_verticales
-		@;cmp r0, #0
-		@;bnq .Sortida
+		.b:
+		bl baja_verticales
+		cmp r0, #1
+		beq .end
 		bl baja_laterales
-		.Sortida:
-		pop {pc}
+		.end:
+		pop {r4, pc}
 
 
 
@@ -262,9 +263,10 @@ baja_verticales:
 @;		r10= resultat de la funcio
 baja_laterales:
 		push {r0-r10, lr}
-		mov r1, #2					@;Carreguem index fila
-		mov r2, #1					@;Carreguem index columna
-		add r3, r4, #COLUMNS		@;Apuntem a la primera posicio valida de la matriu
+		mov r1, #9					@;Carreguem index fila
+		mov r2, #9					@;Carreguem index columna
+		mla r3, r1, r2, r4			@;Apuntem a la primera posicio valida de la matriu
+		sub r3, #1					@;restem 1 per a corregir
 		.buclewhile:
 		ldrb r6, [r3]				@;Carreguem contingut a r6
 		and r7, r6, #7				@;bit clear
@@ -331,16 +333,16 @@ baja_laterales:
 		mov r10, #1					@;Passada de parametres
 		@;SECCIO AVANÇAR/TRACTAMENT D'INDEX
 		.passaseguent:
-		add r3, r3, #1					@;sumem 1 per incrementar lindex
-		cmp r2, #COLUMNS				@;Comprovem que l'index de columna no ha arribat a COLUMNS
-		bne .passacolumna				@;Si no ha arribat a COLUMNS canvia la columna
-		cmp r1, #ROWS					@;si ha arribat a ROWS, Comparo fila amb ROWS
-		beq .Sortir						@;i si tot es el maxim ves a la sortida perque ja hem recorregut la matriu
-		mov r2, #1						@;Si nomes la columna es COLUMNS, tornem a carregar un 1 a columnes...
-		add r1, r1, #1					@;...sumem una fila i 
+		sub r3, r3, #1					@;restem 1 per decrementar lindex
+		cmp r2, #1						@;Comprovem que l'index de columna no ha arribat a 1
+		bne .passacolumna				@;Si no ha arribat a 1 canvia la columna
+		cmp r1, #2						@;si ha arribat a 1, Comparo fila amb 2
+		beq .Sortir						@;i si tot es el limit ves a la sortida perque ja hem recorregut la matriu
+		mov r2, #COLUMNS				@;Si nomes la columna es 1, tornem a carregar COLUMNS a columnes...
+		sub r1, r1, #1					@;...restem una fila una fila i 
 		b .buclewhile					@;passem a la següent cel·la...
 		.passacolumna:
-		add r2 ,r2, #1					@;suma 1 a columnes si encara no ha arribat a COLUMNS
+		sub r2 ,r2, #1					@;suma 1 a columnes si encara no ha arribat a 1
 		b .buclewhile					@;i passa a la següent cel·la...
 		.Sortir:
 		mov r0, r10	
