@@ -172,12 +172,16 @@ recombina_elementos:
 		cmp r3, #15					@;si es un hueco
 		beq .L_copiar2				@;el copiem directament a mat_recomb2 i a mat_recomb1
 		
+		b .L_finalMJOC				@;Per si un cas no es cap d'aquests casos, passem a la seguent casella
+		
 		mov r5, r3, lsr#3			@;movem al temporal el valor dels dos primers bits de la casella (els bits de tipus)
 		and r5, #0x03				@;fem una màscara per a poder comparar directament els dos bits
 		cmp r5, #8					@;comparem amb una gelatina simple
 		beq .L_gelsimple			@;si es simple ho portem al bucle corresponent
 		cmp r5, #16					@;comparem amb una gelatina doble
 		beq .L_geldoble				@;si es doble ho portem al bucle corresponent
+		
+		b .L_finalMJOC				@;si no es cap d'aquests casos, passem a la seguent casella
 		
 	.L_gelsimple:		@;bucle per passar les gelatines simples a mat_recomb1 i mat_recomb2
 		mov r5, #8					@;li possem el seu codi base
@@ -227,6 +231,8 @@ recombina_elementos:
 		beq .L_casellarandom		@;buscarem un codi de la mat_recomb1
 		cmp r3, #16					@;comparem el valor de la casella amb una gelatina dobles
 		beq .L_casellarandom		@;buscarem un codi de la mat_recomb1
+		
+		b .L_finalRECOMB2			@;per si un cas el codi no coincideix amb cap dels anteriors, passem a la seguent casella
 		
 		mov r9, #0					@;inicialitzem el contador de interacions, per si un cas es queda en bucle infinit
 	.L_casellarandom:
