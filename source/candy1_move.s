@@ -2,7 +2,7 @@
 @;=== candy1_move: rutinas para contar repeticiones y bajar elementos ===
 @;=                                                          			=
 @;=== Programador tarea 1E: Aleix.marine@estudiants.urv.cat			  ===
-@;=== Programador tarea 1F: yyy.yyy@estudiants.urv.cat				  ===
+@;=== Programador tarea 1F: aleix.marine@estudiants.urv.cat				  ===
 @;=                                                         	      	=
 
 
@@ -15,6 +15,8 @@
 .text	
 		.align 2
 		.arm
+
+
 
 
 
@@ -40,8 +42,9 @@
 @;  Variables associades a registres:
 @;  	r4 = repeticions de l'element
 @;		r5 = tres bits de menys pes del primer element
-@;		r6 = Apuntador-> matriu + (i*COLUMNS+j)*4
+@;		r6 = Apuntador-> matriu + (i*COLUMNS+j)
 @;		r7 = tres bits de menys pes de l'element actual
+
 	.global cuenta_repeticiones
 cuenta_repeticiones:
 		push {r4-r10,lr}
@@ -50,7 +53,7 @@ cuenta_repeticiones:
 		mov r10, #COLUMNS 			@;r10 registre temporal per a guardar el valor de la constant COLUMNS
 		mla r7, r1, r10, r2 		@;Obtenim a r7 i*COLUMNS + j
 		add r6, r7, r0 				@;Obtenim a r6 i*COLUMNS+j+@matriu, obtenint la direcció a la que apunta el primer element
-		ldr r8, [r6]				@;Carreguem a registres el contingut de la posició actual de la matriu
+		ldrb r8, [r6]				@;Carreguem a registres el contingut de la posició actual de la matriu
 		and r5, r8, #0x00000007		@;Fem una màscara, posant tots els bits a 0 excepte els 3 ultims que mantindran el seu valor a r5
 		cmp r3, #1					@;comparem ori amb 1
 		bgt .Mesgran				@;si es mes gran es 2 o 3 ves a mes gran
@@ -61,7 +64,7 @@ cuenta_repeticiones:
 		bge .Exit					@;Si es mes gran o igual ves a la seccio de sortida
 		add r6, #1 					@;Passem al següent element
 		add r2, #1					@;Modifiquem l'index sumant 1
-		ldr r8, [r6]				@;Carreguem a r8 el contingut de memoria al que apunta r6 (següent element)
+		ldrb r8, [r6]				@;Carreguem a r8 el contingut de memoria al que apunta r6 (següent element)
 		and r7, r8, #0x00000007		@;Tres bits de menys pes de l'element actual
 		cmp r5, r7					@;Comparem els tres bits de menys pes de l'element actual amb el primer element
 		bne .Exit					@;Si son diferents ves a la seccio exit
@@ -74,7 +77,7 @@ cuenta_repeticiones:
 		mov r8, #COLUMNS			@;Carreguem el valor de COLUMNS a r8
 		add r6, r8		 			@;Passem al següent element
 		add r1, #1					@;Modifiquem l'index sumant 1
-		ldr r8, [r6]				@;Carreguem a r8 el contingut de memoria al que apunta r6 (següent element)
+		ldrb r8, [r6]				@;Carreguem a r8 el contingut de memoria al que apunta r6 (següent element)
 		and r7, r8, #0x00000007		@;Tres bits de menys pes de l'element actual a r7
 		cmp r5, r7					@;Comparem els tres bits de menys pes de l'element actual amb el primer element
 		bne .Exit					@;Si son diferents ves a la seccio exit
@@ -90,7 +93,7 @@ cuenta_repeticiones:
 		mov r8, #COLUMNS			@;Carreguem el valor de COLUMNS a r8
 		sub r6, r8					@;Passem al següent element
 		sub r1, #1					@;Modifiquem l'index restant 1
-		ldr r8, [r6]				@;Carreguem a r8 el contingut de memoria al que apunta r6 (següent element)
+		ldrb r8, [r6]				@;Carreguem a r8 el contingut de memoria al que apunta r6 (següent element)
 		and r7, r8, #0x00000007		@;Tres bits de menys pes de l'element actual a r7
 		cmp r5, r7					@;Comparem els tres bits de menys pes de l'element actual amb el primer element
 		bne .Exit					@;Si son diferents ves a la seccio exit
@@ -102,7 +105,7 @@ cuenta_repeticiones:
 		ble .Exit
 		sub r6, #1 					@;Passem al següent element
 		sub r2, #1					@;Modifiquem l'index restant 1
-		ldr r8, [r6]				@;Carreguem a r8 el contingut de memoria al que apunta r6 (següent element)
+		ldrb r8, [r6]				@;Carreguem a r8 el contingut de memoria al que apunta r6 (següent element)
 		and r7, r8, #0x00000007		@;Tres bits de menys pes de l'element actual
 		cmp r5, r7					@;Comparem els tres bits de menys pes de l'element actual amb el primer element
 		bne .Exit					@;Si son diferents ves a la seccio exit
@@ -132,8 +135,12 @@ cuenta_repeticiones:
 	.global baja_elementos
 baja_elementos:
 		push {lr}
-		
-		
+		mov r4, r0
+		@;bl baja_verticales
+		@;cmp r0, #0
+		@;bnq .Sortida
+		bl baja_laterales
+		.Sortida:
 		pop {pc}
 
 
@@ -149,11 +156,90 @@ baja_elementos:
 @;		R4 = dirección base de la matriz de juego
 @;	Resultado:
 @;		R0 = 1 indica que se ha realizado algún movimiento. 
+@;	Variables associades a registres
+@;		r0 = registre de treball de rutina mod_random parametres/sortida
+@;		r1 = fila
+@;		r2 = columna
+@;		r3 = apuntador de posicio actual
+@;		r4 = direccio base matriu de joc
+@;		r5 = temporal
+@;		r6 = apuntador de posicio en un tractamentc
+@;		r8 = contingut de la posicio a tractar (sera 0, 8 o 16)
+@;		r9 = Codi de tipus de la gelatina
+@; 		r10 = emmagatzema si hi ha hagut moviments (r0 esta en ús tota l'estona per mod random)
 baja_verticales:
-		push {lr}
-		
-		
-		pop {pc}
+		push {r1-r11, lr}
+		mov r10, #0						@;No haurem fet cap moviment fins que no es faci el contrari
+		mov r1, #ROWS					@;Carreguem index files
+		mov r2, #COLUMNS				@;Carreguem index columnes
+		mov r4, r0						@;Utilitzarem r4 com a contenidor de la direccio base de la matriu						
+		mla r3, r1, r2, r4				@;Anem a l'ultima posicio per tant, els index son els valors de les constants
+		sub r3, #1						@;Restem 1 per a ajustar (sen va una casella mes enlla de lultima posicio de la matriu)
+		@;BUCLE DE RECORREGUT DE LA MATRIU
+		.whilemove: 				
+		ldrb r8, [r3]					@;Carreguem a r8 el contingut de la posicio actual
+		cmp r1, #1						@;Mira si es la primera fila				
+		beq .primerafila				@;tracta primera fila
+		.segueix:
+		and r11, r8, #7					@;Netegem bits de tipus
+		cmp r11, #0						@;Comparem bits de menys pes amb 0
+		bne .notractes					@;Salta al final del while si l'element no es buit (passem a la seguent cel.la)
+		b .tractar						@;Sino tractem l'element 
+		@;SECCIO PRIMERA FILA (ELEMENTS A 0 PRIMERA FILA)
+		.primerafila:
+		mov r7, r3						@;Guardem la posicio en la que estem
+		.bucle:
+		cmp r8, #15						@;Comparem amb 15
+		addeq r7, #COLUMNS				@;Desplacem cap a baix
+		ldrb r8, [r7]					@;Carreguem contingut de la posicio de mes avall
+		cmp r8, #15						@;Compara amb 15
+		beq .bucle						@;Segueix baixant si trobes 15
+		and r11, r8, #7					@;corregeix bits
+		cmp r11, #0						@;Compara amb 0
+		bne .notractes					@;si no es element buit surt...
+		.aleatori:						@;I sino hauras de generar nun aleatori
+		mov r0, #6						@;Li passem un 6 a la rutina mod random
+		bl mod_random					@;Cridem mod random (genera aleatori entre 0 i 5)
+		add r0, #1						@;Sumem 1 per a corregir 
+		add r8, r0						@;Sumem la gelatina que hi havia (que sera 0, 8 o 16) al aleatori corresponent
+		strb r8, [r7]					@;Guardem l'element generat a la posicio que li toca
+		mov r10, #1						@;Sortida de parametres
+		b .notractes					@;Sortim d'aquesta seccio per a avançar
+		@;SECCIO ELEMENT BUIT
+		.tractar:
+		mov r6, r3						@;Salvem la posicio tractada a r6					
+		.whiletractar:					@;Bucle de tractament
+		sub r6, #COLUMNS				@;restem el valor de columnes per accedir a la casella superior
+		ldrb r8, [r6]					@;Carreguem a r8 el contingut de la casella superior
+		cmp r8, #15						@;Si hi ha un "hueco"...
+		beq .whiletractar				@;...pugem una casella mes
+		cmp r8, #7						@;Mirem si hi ha un bloc fixe
+		beq .notractes					@;I sortim si n'hi ha un
+		and r9, r8, #7					@;mascara de bits
+		cmp r9, #0						@;Si es un element buit llavors... 
+		beq .notractes					@;...sortim
+		sub r12, r8, r9					@;i sino a la casella superior li treiem els bits de tipus
+		strb r12, [r6]					@;Guarda els bits de gelatina a la posicio on era (hem eliminat els de tipus) per tant quedara a 0, 8 o 16
+		ldrb r11, [r3]					@;Carreguem a r11 gelatina a tractar que sera 0, 8 o 16
+		add r5, r11, r9					@;Suma bits de la casella a tractar mes el tipus de la que baixa
+		strb r5, [r3]					@;Guardaho a la casella tractada (la inferior)
+		mov r10, #1						@;Hem fet moviment per tant...
+		@;SECCIO AVANÇAR/TRACTAMENT D'INDEX
+		.notractes:
+		sub r3, r3, #1					@;Restem 1, com que les matrius en ARM són en realitat taules podem desplaçarnos restant 1 fins que l'element actual sigui la posicio base de la matriu
+		cmp r2, #1						@;Comprovem que l'index de columna no ha arribat a 1
+		bne .canvicolumna				@;Si no ha arribat a 1 canvia la columna
+		cmp r1, #1						@;si ha arribat a 1, Comparo fila amb 1
+		beq .Surt						@;i si tot es 1 ves a la sortida perque ja hem recorregut la matriu
+		mov r2, #COLUMNS				@;Si nomes la columna es 1, tornem a carregar el maxim numero de columnes...
+		sub r1, #1						@;...restem una fila i 
+		b .whilemove					@;passem a la següent cel·la...
+		.canvicolumna:
+		sub r2, #1						@;Resta 1 a columnes si encara no ha arribat a 0
+		b .whilemove					@;i passa a la següent cel·la...
+		.Surt:
+		mov r0, r10						@;Sortida de parametres
+		pop {r1-r11, pc}
 
 
 
@@ -164,12 +250,166 @@ baja_verticales:
 @;		R4 = dirección base de la matriz de juego
 @;	Resultado:
 @;		R0 = 1 indica que se ha realizado algún movimiento. 
+@;	Registres associats a variables
+@;		r0 = registre utilitzat per la sortida de mod random
+@;		r1 = index fila
+@;		r2 = index columna
+@;		r3 = apuntador a posicio actual de la matriu
+@;		r4 = direccio base de la matriu 
+@;		r5 = apuntador a posicio de tractament de la matriu
+@;		r6 = contingut de posicio a tractar
+@;		r7 = bits de menys pes de la posicio a tractar
+@;		r8 = valor de la posicio que sha de moure
+@;		r9 = Flag de posicio posible
+@;		r10= resultat de la funcio
 baja_laterales:
-		push {lr}
-		
-		
-		pop {pc}
+		push {r0-r10, lr}
+		mov r1, #2					@;Carreguem index fila
+		mov r2, #1					@;Carreguem index columna
+		add r3, r4, #COLUMNS		@;Apuntem a la primera posicio valida de la matriu
+		.buclewhile:
+		ldrb r6, [r3]				@;Carreguem contingut a r6
+		and r7, r6, #7				@;bit clear
+		cmp r7, #0					@;Comparem amb 0
+		bne .passaseguent			@;Passem al següent element
+		mov r9, #0					@;posem flag a 0
+		@;Caselles de lesquerra
+		cmp r2, #1					@;mira si estas al limit esquerra de la matriu
+		beq .comprovadret			@;Si estas al limit de la matriu passa a dret directament
+		sub r5, r3, #COLUMNS		@;Restar columnes
+		sub r5, r5, #1				@;restem 1 per a ajustar
+		ldrb r8, [r5]				@;Carregar a r8 el contingut de la posicio que sha de moure
+		and r8, r8, #7				@;filtrem bits
+		cmp r8, #7					@;comparem amb 7
+		beq .comprovadret			@;si no pots comprova lelement de la dreta
+		cmp r8, #0					@;compara amb el 0 per a saber si lelement esta buit
+		addne r9, r9, #1			@;Afegeix al flag un 1
+		.comprovadret:
+		cmp r2, #COLUMNS			@;mira si estas al limit dret de la matriu
+		beq .fi						@;tractem l'element esquerra
+		sub r5, r3, #COLUMNS		@;Restar columnes
+		add r5, r5, #1				@;Afegim 1 a l'index per 
+		ldrb r8, [r5]				@;carrega la posicio de la dreta
+		and r8, r8, #7				@;filtrem bits
+		cmp r8, #7					@;comparem amb 7 
+		beq .fi						@;si no pots ves al fi
+		cmp r8, #0					@;compara amb el 0 per a saber si lelement esta buit
+		addne r9, r9, #2			@;Afegeix dos al flag
+		.fi:
+		cmp r9, #1					@;Compara amb un 1 el flag
+		beq .Esquerra				@;Si 1 es pot baixar l'esquerra
+		cmp r9, #2					@;Compara amb 2 el flag
+		beq .Dreta					@;Si 2 es pot baixar el dret
+		cmp r9, #0					@;Compara amb 0 el flag
+		beq .passaseguent			@;passa al seguent si no hi ha cap element susceptible de per baixat
+		@;SECCIO D'ELECCIO ALEATORIA
+		@; Llavors el flag es 9 i podem baixar pels dos llocs, per tant generem laleatori
+		mov r0, #1					@;Carreguem un 1 a r0 (per a passar parametre)
+		bl mod_random				@;cridem mod random
+		cmp r0, #0					@;Si no es 0			
+		bne .Dreta					@;Anem a la dreta arbitrariament
+		@;SECCIO ESQUERRA
+		.Esquerra:
+		sub r5, r3, #COLUMNS		@;Restar columnes
+		sub r5, r5, #1				@;restem 1 per a ajustar
+		ldrb r8, [r5]				@;Carregar a r8 el contingut de la posicio que sha de moure
+		and r9, r8, #24				@;Bit clear
+		strb r9, [r5]				@;Guarda els bits de mes pes on estaven
+		sub r8, r8, r9				@;obte el codi de menor pes
+		add r9, r8, r6				@;Carrega a r9 el contingut de la posicio actual (sera 0, 8 o 16) mes el codi de  menys pes
+		strb r9, [r3]				@;Guarda a la posicio actual
+		mov r10, #1					@;Passada de parametres
+		b .passaseguent				@;Sortim
+		@;SECCIO DRETA
+		.Dreta:
+		sub r5, r3, #COLUMNS		@;Restar columnes
+		add r5, r5, #1				@;sumem 1 per a ajustar
+		ldrb r8, [r5]				@;Carregar a r8 el contingut de la posicio que sha de moure
+		and r9, r8, #24				@;Bit clear
+		strb r9, [r5]				@;Guarda els bits de mes pes on estaven
+		sub r8, r8, r9				@;obte el codi de menor pes
+		add r9, r8, r6				@;Carrega a r9 el contingut de la posicio actual (sera 0, 8 o 16) mes el codi de  menys pes
+		strb r9, [r3]				@;Guarda a la posicio actual
+		mov r10, #1					@;Passada de parametres
+		@;SECCIO AVANÇAR/TRACTAMENT D'INDEX
+		.passaseguent:
+		add r3, r3, #1					@;sumem 1 per incrementar lindex
+		cmp r2, #COLUMNS				@;Comprovem que l'index de columna no ha arribat a COLUMNS
+		bne .passacolumna				@;Si no ha arribat a COLUMNS canvia la columna
+		cmp r1, #ROWS					@;si ha arribat a ROWS, Comparo fila amb ROWS
+		beq .Sortir						@;i si tot es el maxim ves a la sortida perque ja hem recorregut la matriu
+		mov r2, #1						@;Si nomes la columna es COLUMNS, tornem a carregar un 1 a columnes...
+		add r1, r1, #1					@;...sumem una fila i 
+		b .buclewhile					@;passem a la següent cel·la...
+		.passacolumna:
+		add r2 ,r2, #1					@;suma 1 a columnes si encara no ha arribat a COLUMNS
+		b .buclewhile					@;i passa a la següent cel·la...
+		.Sortir:
+		mov r0, r10	
+		pop {r0-r10,pc}
 
+
+@;:::RUTINAS DE SOPORTE:::
+
+
+
+@; mod_random(n): rutina para obtener un número aleatorio entre 0 y n-1,
+@;	utilizando la rutina 'random'
+@;	Restricciones:
+@;		* el parámetro 'n' tiene que ser un valor entre 2 y 255, de otro modo,
+@;		  la rutina lo ajustará automáticamente a estos valores mínimo y máximo
+@;	Parámetros:
+@;		R0 = el rango del número aleatorio (n)
+@;	Resultado:
+@;		R0 = el número aleatorio dentro del rango especificado (0..n-1).global mod_random
+mod_random:
+		push {r1-r4, lr}
+		
+		cmp r0, #2				@;compara el rango de entrada con el mínimo
+		bge .Lmodran_cont
+		mov r0, #2				@;si menor, fija el rango mínimo
+	.Lmodran_cont:
+		and r0, #0xff			@;filtra los 8 bits de menos peso
+		sub r2, r0, #1			@;R2 = R0-1 (número más alto permitido)
+		mov r3, #1				@;R3 = máscara de bits
+	.Lmodran_forbits:
+		cmp r3, r2				@;genera una máscara superior al rango requerido
+		bhs .Lmodran_loop
+		mov r3, r3, lsl #1
+		orr r3, #1				@;inyecta otro bit
+		b .Lmodran_forbits
+		
+	.Lmodran_loop:
+		bl random				@;R0 = número aleatorio de 32 bits
+		and r4, r0, r3			@;filtra los bits de menos peso según máscara
+		cmp r4, r2				@;si resultado superior al permitido,
+		bhi .Lmodran_loop		@; repite el proceso
+		mov r0, r4			@; R0 devuelve número aleatorio restringido a rango
+		
+		pop {r1-r4, pc}
+		
+		
+		
+@;random(): rutina para obtener un número aleatorio de 32 bits, a partir de
+@;	otro valor aleatorio almacenado en la variable global 'seed32' (declarada
+@;	externamente)
+@;	Restricciones:
+@;		* el valor anterior de 'seed32' no puede ser 0
+@;	Resultado:
+@;		R0 = el nuevo valor aleatorio (también se almacena en 'seed32')
+random:
+	push {r1-r5, lr}
+		
+	ldr r0, =seed32				@;R0 = dirección de la variable 'seed32'
+	ldr r1, [r0]				@;R1 = valor actual de 'seed32'
+	ldr r2, =0x0019660D
+	ldr r3, =0x3C6EF35F
+	umull r4, r5, r1, r2
+	add r4, r3					@;R5:R4 = nuevo valor aleatorio (64 bits)
+	str r4, [r0]				@;guarda los 32 bits bajos en 'seed32'
+	mov r0, r5					@;devuelve los 32 bits altos como resultado
+		
+	pop {r1-r5, pc}	
 
 
 .end

@@ -144,9 +144,10 @@ inicializa_matriz:
 @;		R9 = contador de iteracions
 @;		R10= puntero per saber la posicio aleatoria de mat_recomb1 creada
 @;		R11= temporal
+@;		R12= index files * columnes
 	.global recombina_elementos
 recombina_elementos:
-		push {r0-r11, lr}
+		push {r0-r12, lr}
 		
 		mov r4, r0					@;backup de la direccio base de la matriu
 		ldr r7, =mat_recomb1		@;carreguem mat_recomb1
@@ -160,9 +161,9 @@ recombina_elementos:
 	.L_buclefilasMJOC:
 		mov r2, #0					@;inicializamos columnas
 		mov r3, #COLUMNS			@;guardem al temporal r3 el maxim de columnes
-		mul r3, r1, r3				@;r3=index files x columnes
+		mul r12, r1, r3				@;r12=index files x columnes
 	.L_buclecolMJOC:
-		add r6, r3, r2				@;preparamos puntero
+		add r6, r12, r2				@;preparamos puntero
 		ldrb r3, [r4, r6]			@;R3 = valor casilla (r1, r2) matriu de joc
 		
 		cmp r3, #0					@;si es un espai buit
@@ -172,34 +173,43 @@ recombina_elementos:
 		cmp r3, #15					@;si es un hueco
 		beq .L_copiar2				@;el copiem directament a mat_recomb2 i a mat_recomb1
 		
-		b .L_finalMJOC				@;Per si un cas no es cap d'aquests casos, passem a la seguent casella
+		@;si no es cap d'aquests casos, passem a fer una mascara
 		
 		mov r5, r3, lsr#3			@;movem al temporal el valor dels dos primers bits de la casella (els bits de tipus)
 		and r5, #0x03				@;fem una màscara per a poder comparar directament els dos bits
-		cmp r5, #8					@;comparem amb una gelatina simple
+		cmp r5, #1					@;comparem amb una gelatina simple (codi base = 01 = 1)
 		beq .L_gelsimple			@;si es simple ho portem al bucle corresponent
-		cmp r5, #16					@;comparem amb una gelatina doble
+		cmp r5, #2					@;comparem amb una gelatina doble (codi base = 10 = 2)
 		beq .L_geldoble				@;si es doble ho portem al bucle corresponent
+		cmp r5, #0					@;comparem amb un element simple
+		beq .L_copiar1				@;si es un element simple ho portem al bucle corresponent
 		
 		b .L_finalMJOC				@;si no es cap d'aquests casos, passem a la seguent casella
 		
 	.L_gelsimple:		@;bucle per passar les gelatines simples a mat_recomb1 i mat_recomb2
-		mov r5, #8					@;li possem el seu codi base
-		strb r7, [r5, r6]			@;passem el codi base de la gelatina simple, en la mateixa posicio, a mat_recomb1
-		strb r8, [r5, r6]			@;passem el codi base de la gelatina simple, en la mateixa posicio, a mat_recomb2
+		sub r5, r3, #8				@;r5 = elemento simple de la gelatina simple (r5 = gel. simple - 8)
+		strb r5, [r7, r6]			@;passem el codi d'element simple de la gelatina simple, en la mateixa posicio, a mat_recomb1
+		mov r5, #8					@;posem el codi base de gelatina simple
+		strb r5, [r8, r6]			@;passem el codi base de la gelatina simple, en la mateixa posicio, a mat_recomb2
 		b .L_finalMJOC				@;una vegada finalitza va al bucle final per seguir recorrent la matriu de joc
 		
 	
 	.L_geldoble:		@;bucle per passar les gelatines dobles a mat_recomb1 i mat_recomb2
-		mov r5, #16					@;li possem el codi base
-		strb r7, [r5, r6]			@;passem el codi base de la gelatina doble, en la mateixa posicio, a mat_recomb1
-		strb r8, [r5, r6]			@;passem el codi base de la gelatina doble, en la mateixa posicio, a mat_recomb2
+		sub r5, r3, #16				@;r5 = elemento simple de la gelatina doble (r5 = gel. doble - 16)
+		strb r5, [r7, r6]			@;passem el codi d'element simple de la gelatina doble, en la mateixa posicio, a mat_recomb1
+		mov r5, #16					@;posem el codi base de gelatina doble
+		strb r5, [r8, r6]			@;passem el codi base de la gelatina doble, en la mateixa posicio, a mat_recomb2
 		b .L_finalMJOC				@;una vegada finalitza va al bucle final per seguir recorrent la matriu de joc 
 		
+	.L_copiar1:						@;bucle per a copiar a la mat_recomb1 els valors de la matriu de joc (sense huecos ni blocs)
+		strb r3, [r7, r6]			@;guardem a la mat_recomb1 el valor de la matriu de joc en la mateixa posicio
+		b .L_finalMJOC				@;una vegada finalitza va al bucle final per seguir recorrent la matriu de joc
+	
+	
 	.L_copiar2:			@;bucle per a copiar directament a mat_recomb2
-		strb r8, [r3, r6]			@;copio el valor de la matriu de joc a mat_recomb2
+		strb r3, [r8, r6]			@;copio el valor de la matriu de joc a mat_recomb2
 		mov r3, #0					@;canviem el valor de un bloc solid (7) o un hueco(15) a 0
-		strb r7, [r3, r6]			@;guardem a la mat_recomb1 un 0 en la posicio del bloc solid/hueco
+		strb r3, [r7, r6]			@;guardem a la mat_recomb1 un 0 en la posicio del bloc solid/hueco
 		
 	.L_finalMJOC:
 		@;si no forma cap repeticio, anem a la seguent posicio
@@ -219,9 +229,9 @@ recombina_elementos:
 	.L_buclefilasRECOMB2:
 		mov r2, #0					@;inicializamos columnas
 		mov r3, #COLUMNS			@;guardem al temporal r3 el maxim de columnes
-		mul r3, r1, r3				@;r3=index files x columnes
+		mul r12, r1, r3				@;r12=index files x columnes
 	.L_buclecolRECOMB2:
-		add r6, r3, r2				@;preparamos puntero
+		add r6, r12, r2				@;preparamos puntero
 		ldrb r3, [r8, r6]			@;R3 = valor casilla (r1, r2) mat_recomb2
 		
 	@;caselles que requereixen codi:
@@ -248,7 +258,7 @@ recombina_elementos:
 		ldrb r5, [r7, r10]			@;r5 = valor de mat_recomb1 a la casella aleatoria
 	@;hem de sumar el contador abans de tornar a començar el bucle (en cas de que trobem un 0)
 		add r9, #1					@;sumem 1 al contador
-		cmp r9, #99				@;posem un maxim de iteracions
+		cmp r9, #300				@;posem un maxim de iteracions
 		beq .L_FINAL				@;terminem el programa si fa masses iteracions (anem directament al final ja que voldra dir que no queden caselles de codi)
 		
 		cmp r5, #0					@;comparem la casella aleatoria amb 0 (element ja usat)
@@ -263,7 +273,7 @@ recombina_elementos:
 		cmp r0, #3					@;comparem amb 3 repeticions
 		bge .L_casellarandom		@;tornem a buscar un altre casella random en cas de que trobem una secuencia
 		mov r3, #0					@;guardem al temporal 0
-		strb r3, [r7, r6]			@;una vez comprobamos que no hay combinacion, guardamos un 0 en la mat_recomb1
+		strb r3, [r7, r10]			@;una vez comprobamos que no hay combinacion, guardamos un 0 en la mat_recomb1
 		
 	.L_finalRECOMB2:
 		@;si no forma cap repeticio, anem a la seguent posicio
@@ -290,15 +300,14 @@ recombina_elementos:
 	.L_buclefilasFIN:
 		mov r2, #0					@;inicializamos columnas
 		mov r3, #COLUMNS			@;guardem al temporal r3 el maxim de columnes
-		mul r3, r1, r3				@;r3=index files x columnes
+		mul r12, r1, r3				@;r12=index files x columnes
 	.L_buclecolFIN:
-		add r6, r3, r2				@;preparamos puntero
+		add r6, r12, r2				@;preparamos puntero
 		ldrb r3, [r8, r6]			@;R3 = valor casilla (r1, r2) mat_recomb2
 		
-		strb r4, [r3, r6]			@;guardem a la matriu de joc el valor de mat_recomb2 a la mateixa posicio
+		strb r3, [r4, r6]			@;guardem a la matriu de joc el valor de mat_recomb2 a la mateixa posicio
 		
 	.L_finalFIN:
-		@;si no forma cap repeticio, anem a la seguent posicio
 		add r6, #1					@;avanza posicion
 		add r2, #1					@;avanza columna
 		cmp r2, #COLUMNS			@;comprueba que no sea el final de la fila
@@ -308,7 +317,7 @@ recombina_elementos:
 		cmp r1, #ROWS				@;comprueba que no sea el final de columna
 		blo .L_buclefilasFIN		@;si no esta al final, avanza al siguiente elemento
 		
-		pop {r0-r11, pc}
+		pop {r0-r12, pc}
 
 
 
