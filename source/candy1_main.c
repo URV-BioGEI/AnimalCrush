@@ -6,7 +6,7 @@
 	(2º curso de Grado de Ingeniería Informática - ETSE - URV)
 	
 	Analista-programador: santiago.romani@urv.cat
-	Programador 1: xxx.xxx@estudiants.urv.cat
+	Programador 1: cristina.izquierdo@estudiants.urv.cat
 	Programador 2: yyy.yyy@estudiants.urv.cat
 	Programador 3: Aleix.Marine@estudiants.urv.cat
 	Programador 4: uuu.uuu@estudiants.urv.cat
@@ -46,8 +46,8 @@ void actualizar_contadores(int code)
 	if (code & 4) printf("\x1b[38m\x1b[1;28H %d ", movements);
 	if (code & 8) printf("\x1b[37m\x1b[2;28H %d ", gelees);
 }
-
-
+ 
+ 
 
 /* Programa principal: control general del juego */
 int main(void)
@@ -73,8 +73,8 @@ int main(void)
 	{
 		if (initializing)		//////	SECCIÓN DE INICIALIZACIÓN	//////
 		{
-			//inicializa_matriz(matrix, level);
-			copia_mapa(matrix, 2);
+			inicializa_matriz(matrix, level);
+			//copia_mapa(matrix, 2);
 			escribe_matriz(matrix);
 			repeticiones=cuenta_repeticiones(matrix, f, c, ori);
 			retardo(5);
