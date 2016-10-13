@@ -45,7 +45,7 @@
 
 	.global cuenta_repeticiones
 cuenta_repeticiones:
-		push {r4-r10,lr}
+		push {r1-r10,lr}
 		@;Seccio ENTRADA
 		mov r4, #1 					@;r4: repeticions de l'element=1
 		mov r10, #COLUMNS 			@;r10 registre temporal per a guardar el valor de la constant COLUMNS
@@ -112,7 +112,7 @@ cuenta_repeticiones:
 		@;Seccio EXIT El programa sempre acabara aqui, per tant fem les operacions pertinents de sortida
 		.Exit:
 		mov r0, r4
-		pop {r4-r10, pc}
+		pop {r1-r10, pc}
 
 
 
