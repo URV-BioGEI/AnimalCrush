@@ -76,9 +76,6 @@ recombina_elementos:
 		
 		pop {pc}
 
-
-
-<<<<<<< HEAD
 @;:::RUTINAS DE SOPORTE:::
 
 
@@ -122,8 +119,6 @@ random:
 		
 	pop {r1-r5, pc}	
 
-=======
->>>>>>> prog3
 
 
 .end
