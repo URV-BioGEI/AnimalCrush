@@ -45,7 +45,7 @@
 
 	.global cuenta_repeticiones
 cuenta_repeticiones:
-		push {r1-r10,lr}
+		push {r1-r11,lr}
 		@;Seccio ENTRADA
 		mov r4, #1 					@;r4: repeticions de l'element=1
 		mov r10, #COLUMNS 			@;r10 registre temporal per a guardar el valor de la constant COLUMNS
@@ -58,8 +58,10 @@ cuenta_repeticiones:
 		beq .Sud					@;Si es 1 vol dir que ori es sud  i ves a sud
 		@;Seccio EST
 		.Est:
-		cmp r2, #COLUMNS			@;Comparem amb COLUMNS
-		bge .Exit					@;Si es mes gran o igual ves a la seccio de sortida
+		mov r11, #COLUMNS
+		sub r11, #1
+		cmp r2, r11					@;Comparem amb COLUMNS
+		bgt .Exit					@;Si es mes gran o igual ves a la seccio de sortida
 		add r6, #1 					@;Passem al següent element
 		add r2, #1					@;Modifiquem l'index sumant 1
 		ldrb r8, [r6]				@;Carreguem a r8 el contingut de memoria al que apunta r6 (següent element)
@@ -70,8 +72,10 @@ cuenta_repeticiones:
 		b .Est
 		.Sud:
 		@;Seccio SUD
-		cmp r2, #ROWS				@;Comparem amb ROWS
-		bge .Exit					@;Si es mes gran o igual ves a la seccio de sortida
+		mov r11, #ROWS
+		sub r11, #1
+		cmp r1, r11					@;Comparem amb ROWS
+		bgt .Exit					@;Si es mes gran o igual ves a la seccio de sortida
 		mov r8, #COLUMNS			@;Carreguem el valor de COLUMNS a r8
 		add r6, r8		 			@;Passem al següent element
 		add r1, #1					@;Modifiquem l'index sumant 1
@@ -112,7 +116,7 @@ cuenta_repeticiones:
 		@;Seccio EXIT El programa sempre acabara aqui, per tant fem les operacions pertinents de sortida
 		.Exit:
 		mov r0, r4
-		pop {r1-r10, pc}
+		pop {r1-r11, pc}
 
 
 

@@ -55,7 +55,7 @@ hay_secuencia:
 				cmp r2, r5
 				bge .LfiwhileColum
 				cmp r8, #3
-				bge .LfiwhileColum
+				bge .LfiwhileFila
 				sub r6, r4, #1				@; R6: fila-1;
 				cmp r1, r6
 				bge .Lif1
@@ -66,7 +66,7 @@ hay_secuencia:
 				mov r0, r9					@; R0: recupera matriz
 				.Lif1:
 				cmp r8, #3
-				bge .Lif2
+				bge .LfiwhileFila
 				sub r7, r5, #1				@; R7: columna-1;
 				cmp r2, r7
 				bge .Lif2
