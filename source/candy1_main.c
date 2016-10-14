@@ -6,10 +6,10 @@
 	(2º curso de Grado de Ingeniería Informática - ETSE - URV)
 	
 	Analista-programador: santiago.romani@urv.cat
-	Programador 1: cristina.izquierdo@estudiants.urv.cat
-	Programador 2: yyy.yyy@estudiants.urv.cat
-	Programador 3: Aleix.Marine@estudiants.urv.cat
-	Programador 4: uuu.uuu@estudiants.urv.cat
+	Programador 1: albert.canelles@estudiants.urv.cat
+	Programador 2: aleix.marine@estudiants.urv.cat
+	Programador 3: bernat.bosca@estudiants.urv.cat
+	Programador 4: cristina.izquierdo@estudiants.urv.cat
 
 ------------------------------------------------------------------------------*/
 #include <nds.h>
@@ -21,14 +21,10 @@
 /* variables globales */
 char matrix[ROWS][COLUMNS];		// matriz global de juego
 int seed32;						// semilla de números aleatorios
-int level = 1;					// nivel del juego (nivel inicial = 0)
+int level = 0;					// nivel del juego (nivel inicial = 0)
 int points;						// contador global de puntos
 int movements;					// número de movimientos restantes
 int gelees;						// número de gelatinas restantes
-int repeticiones;
-int f;
-int c;
-int ori;
 
 
 
@@ -41,13 +37,13 @@ int ori;
 		bit 3:	gelatinas  */
 void actualizar_contadores(int code)
 {
-	if (code & 1) printf("\x1b[38m\x1b[1;8H %d", repeticiones);
+	if (code & 1) printf("\x1b[38m\x1b[1;8H %d", level);
 	if (code & 2) printf("\x1b[39m\x1b[2;8H %d  ", points);
 	if (code & 4) printf("\x1b[38m\x1b[1;28H %d ", movements);
 	if (code & 8) printf("\x1b[37m\x1b[2;28H %d ", gelees);
 }
- 
- 
+
+
 
 /* Programa principal: control general del juego */
 int main(void)
@@ -66,17 +62,14 @@ int main(void)
 	printf("\x1b[38m\x1b[1;15H movimientos:");
 	printf("\x1b[37m\x1b[2;15H   gelatinas:");
 	actualizar_contadores(15);
-	c=2;
-	f=2;
-	ori=1;
+
 	do							// bucle principal del juego
 	{
 		if (initializing)		//////	SECCIÓN DE INICIALIZACIÓN	//////
 		{
 			inicializa_matriz(matrix, level);
-			//copia_mapa(matrix, 2);
+			//copia_mapa(matrix, 8);
 			escribe_matriz(matrix);
-			repeticiones=cuenta_repeticiones(matrix, f, c, ori);
 			retardo(5);
 			initializing = 0;
 			falling = 0;
@@ -134,7 +127,7 @@ int main(void)
 				{	retardo(5);				// deshacer el cambio
 					intercambia_posiciones(matrix, mX, mY, dX, dY);
 				}
-				escribe_matriz(matrix);	// muestra las eliminaciones o el retorno
+				escribe_matriz(matrix);	// muetra las eliminaciones o el retorno
 			}
 			while (keysHeld() & KEY_TOUCH)		// esperar a liberar la
 			{	swiWaitForVBlank();				// pantalla táctil
@@ -183,7 +176,7 @@ int main(void)
 							&& (level < MAXLEVEL-1))
 						level++;				// incrementa nivel
 					printf("\x1b[2;8H      ");	// borra puntos anteriores
-					initializing = 1;			// pasa a inicializar nivel
+					initializing = 1;			// passa a inicializar nivel
 				}
 				else
 				{
