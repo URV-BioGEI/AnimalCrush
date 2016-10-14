@@ -59,7 +59,7 @@ cuenta_repeticiones:
 		@;Seccio EST
 		.Est:
 		mov r11, #COLUMNS
-		sub r11, #1
+		sub r11, #2
 		cmp r2, r11					@;Comparem amb COLUMNS
 		bgt .Exit					@;Si es mes gran o igual ves a la seccio de sortida
 		add r6, #1 					@;Passem al següent element
@@ -73,7 +73,7 @@ cuenta_repeticiones:
 		.Sud:
 		@;Seccio SUD
 		mov r11, #ROWS
-		sub r11, #1
+		sub r11, #2
 		cmp r1, r11					@;Comparem amb ROWS
 		bgt .Exit					@;Si es mes gran o igual ves a la seccio de sortida
 		mov r8, #COLUMNS			@;Carreguem el valor de COLUMNS a r8

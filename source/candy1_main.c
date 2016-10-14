@@ -67,8 +67,8 @@ int main(void)
 	{
 		if (initializing)		//////	SECCIÓN DE INICIALIZACIÓN	//////
 		{
-			//inicializa_matriz(matrix, level);
-			copia_mapa(matrix, 0);
+			inicializa_matriz(matrix, level);
+			//copia_mapa(matrix, 0);
 			escribe_matriz(matrix);
 			retardo(5);
 			initializing = 0;

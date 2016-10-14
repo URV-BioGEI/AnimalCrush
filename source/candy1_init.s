@@ -258,7 +258,7 @@ recombina_elementos:
 		ldrb r5, [r7, r10]			@;r5 = valor de mat_recomb1 a la casella aleatoria
 	@;hem de sumar el contador abans de tornar a començar el bucle (en cas de que trobem un 0)
 		add r9, #1					@;sumem 1 al contador
-		cmp r9, #300				@;posem un maxim de iteracions
+		cmp r9, #2048				@;posem un maxim de iteracions
 		beq .L_FINAL				@;terminem el programa si fa masses iteracions (anem directament al final ja que voldra dir que no queden caselles de codi)
 		
 		cmp r5, #0					@;comparem la casella aleatoria amb 0 (element ja usat)
