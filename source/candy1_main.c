@@ -6,10 +6,10 @@
 	(2º curso de Grado de Ingeniería Informática - ETSE - URV)
 	
 	Analista-programador: santiago.romani@urv.cat
-	Programador 1: albert.canelles@estudiants.urv.cat
-	Programador 2: aleix.marine@estudiants.urv.cat
-	Programador 3: bernat.bosca@estudiants.urv.cat
-	Programador 4: cristina.izquierdo@estudiants.urv.cat
+	Programador 1: cristina.izquierdo@estudiants.urv.cat
+	Programador 2: bernat.bosca@estudiants.urv.cat
+	Programador 3: aleix.marine@estudiants.urv.cat
+	Programador 4: albert.cañellas@estudiants.urv.cat
 
 ------------------------------------------------------------------------------*/
 #include <nds.h>
@@ -68,7 +68,7 @@ int main(void)
 		if (initializing)		//////	SECCIÓN DE INICIALIZACIÓN	//////
 		{
 			inicializa_matriz(matrix, level);
-			//copia_mapa(matrix, 0);
+			//copia_mapa(matrix, 9);
 			escribe_matriz(matrix);
 			retardo(5);
 			initializing = 0;

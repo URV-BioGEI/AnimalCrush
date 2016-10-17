@@ -1,8 +1,8 @@
 @;=                                                               		=
 @;=== candy1_combi.s: rutinas para detectar y sugerir combinaciones   ===
 @;=                                                               		=
-@;=== Programador tarea 1G: albert.canelles@estudiants.urv.cat				  ===
-@;=== Programador tarea 1H: albert.canelles@estudiants.urv.cat				  ===
+@;=== Programador tarea 1G: albert.cañellas@estudiants.urv.cat				  ===
+@;=== Programador tarea 1H: albert.cañellas@estudiants.urv.cat				  ===
 @;=                                                             	 	=
 
 
@@ -29,142 +29,153 @@
 	.global hay_combinacion
 hay_combinacion:
 		push {r1-r12,lr}
-				mov r4, r0						@;*Moviment horitzontal guardar direcio base
-				mov r3, #ROWS					@;dim de files
-				mov r12, #COLUMNS				@;dim de columnes
-				mov r0, #0						@;variable que controla si s'ha trobat una combinacio
-				mov r1, #0						@;r1=files , inicialitza a 0 per fer totes les files en el mov. hor
-				mov r2, #0						@;r2=columnes,
-				sub r12, #1						@;c<columns-1
+				mov r5, r0							@;!*Moviment horitzontal*! guardar direcio base a r5
+				mov r3, #ROWS						@;dim de files
+				mov r12, #COLUMNS					@;dim de columnes
+				mov r0, #6							@;variable que controla si s'ha trobat una combinacio
+				mov r1, #0							@;r1=files 
+				mov r2, #0							@;r2=columnes
 			.Lwhilef1:
-				cmp r1, r3						@;comprovar condicio f<rows === es  igual a aixo f<rows?????
-				bge .Lfinwhilef1				@;saltar a final del while de files
-				cmp r0, #6						@;comprovar que no s'hagi trobat ja una combinacio
-				beq .Lfi
+				cmp r1, #ROWS						@;comprovar condicio f<rows 
+				bge .Lfinwhilef1					@;saltar a final del while de files
+				cmp r0, #6							@;comprovar que no s'hagi trobat ja una combinacio
+				bne .Lfi
 				.Lwhilec1:
+					mov r12, #COLUMNS
+					sub r12, #1						@;r12=dim de columnes-1
 					cmp r2, r12
 					bge .Lfinwhilec1
 					cmp r0, #6
-					beq .Lfinwhilec1
-					mul r5, r1 ,r3
-					add r5, r2					@;r5=desplaçament(rows*f+c)
-					ldrb r6, [r4, r5]			@;r6= tipus de gelatina actual
-					cmp r6, #0
+					bne .Lfi
+					mul r4, r1 ,r3
+					add r4, r2						@;r4=desplaçament(rows*f+c)
+					ldrb r6, [r5, r4]				@;r6= tipus de gelatina actual
+					cmp r6, #0						@;comparacio amb llocs especials a gelatina actual
 					beq .Lif1
 					cmp r6, #7
 					beq .Lif1
 					cmp r6, #15
-					beq .Lif1					@;comparacio amb llocs especials
-					add r5, #1
-					ldrb r8, [r4, r5]			@;r8= tipus gelatina seguent			
-					and r7, r6, #0x00000007		@;r7 mascara per comparar el bits de les gelatines (gelatina actual)
-					and r11, r8, #0x00000007	@;r11=mascara per comparar (gelatina seguent)
-					cmp r7, r11
-					beq .Lgeligual
-					cmp r8, #0
+					beq .Lif1					
+					add r4, #1
+					ldrb r8, [r5, r4]				@;r8= tipus gelatina seguent			
+					cmp r8, #0						@;comparacio amb llocs especials a gelatina seguent
 					beq .Lif1
 					cmp r8, #7
 					beq .Lif1
 					cmp r8, #15
-					beq .Lif1	 				@;comparacio amb gelatina seguent amb llocs especials
-					strb r6, [r4, r5]			@;mov de gelatina actual a r9=actual
-					sub r5, #1					@;mov de gelatina seguent a r10=seguent
-					strb r8, [r4, r5]
+					beq .Lif1	 				
+					and r7, r6, #0x00000007			@;r7 mascara per comparar el bits de menor pes de les gelatines (gelatina actual)
+					and r11, r8, #0x00000007		@;r11=mascara per comparar (gelatina seguent)
+					cmp r7, r11						@;comparacio de les gelatines si son igual no intercanviar
+					beq .Lgeligual
+					strb r6, [r5, r4]				@;intercanvi gelatina actual al lloc de la seguent
+					sub r4, #1						@;intercanvi gelatina seguent al lloc de l'actual
+					strb r8, [r5, r4]
 					.Lgeligual:
-					bl detectar_orientacion
+					bl detectar_orientacion			@;crida a la funcio que detecta orientacio en la posicio actual
 					cmp r0, #6
-					bne .Lintercanvi_org_hor					@;si e trobat combinacio ves al final
-					strb r6, [r4, r5]			@;r6=gelatina actual torna al lloc original
-					add r5, #1					@;desplaçament+1
-					strb r8, [r4, r5]			@;gelatina seguent torna al lloc original
-					sub r5, #1
-					.Lif1:
+					bne .Lintercanvi_org_hor		@;si e trobat combinacio ves al final
 					add r2, #1
+					bl detectar_orientacion			@;detectar orientacio en la posicio seguent
+					sub r2, #1
+					cmp r0, #6
+					bne .Lintercanvi_org_hor		@;si e trobat combinacio ves al final
+					cmp r7, r11
+					beq .Lif1
+					strb r6, [r5, r4]				@;r6=gelatina actual torna al lloc original
+					add r4, #1						@;desplaçament+1
+					strb r8, [r5, r4]				@;r8=gelatina seguent torna al lloc original
+					.Lif1:
+					add r2, #1						@;c+1
 					b .Lwhilec1
 				.Lfinwhilec1:
-				add r1, #1
-				mov r2, #0
+				add r1, #1							@;f+1
+				mov r2, #0							@;c=0
 				b .Lwhilef1
 			.Lfinwhilef1:
-				mov r1, #0						@;!*Moviment vertical*! r1=files , inicialitza a 0 per fer totes les files en el mov. hor
-				mov r2, #0						@;r2=columnes, r1=files 
-				mov r3, #ROWS					@;dim de files
-				mov r12, #COLUMNS				@;dim de columnes
-				add r12, #1	
-				sub r3, #1						@;c<rows-1
+				mov r1, #0							@;!*Moviment vertical*! r1=files 
+				mov r2, #0							@;r2=columnes, r1=files 
+				mov r3, #ROWS						@;dim de files
+				mov r12, #COLUMNS					@;dim de columnes
+				add r12, #1
 			.Lwhilef2:
-				cmp r1, r3						@;comprovar condicio f<rows === es  igual a aixo f<rows?????
-				bge .Lfinwhilef2				@;saltar a final del while de files
-				cmp r0, #6						@;comprovar que no s'hagi trobat ja una combinacio
+				mov r11, #ROWS
+				sub r11, #1							@;r11=dim de files-1
+				cmp r1, r11							@;comprovar condicio f<rows 
+				bge .Lfi							@;saltar a final del while de files
+				cmp r0, #6							@;comprovar que no s'hagi trobat ja una combinacio
 				bne .Lfi
 				.Lwhilec2:
-					cmp r2, r12
+					cmp r2, #COLUMNS
 					bge .Lfinwhilec2
 					cmp r0, #6
-					bne .Lfinwhilec2
-					mul r5, r1 ,r3
-					add r5, r2					@;r5=desplaçament(rows*f+c)
-					ldrb r6, [r4, r5]			@;r6= tipus de gelatina actual
-					cmp r6, #0
+					bne .Lfi
+					mul r4, r1 ,r3
+					add r4, r2						@;r4=desplaçament(rows*f+c)
+					ldrb r6, [r5, r4]				@;r6= tipus de gelatina actual
+					cmp r6, #0						@;comparacio amb llocs especials
 					beq .Lif2
 					cmp r6, #7
 					beq .Lif2
 					cmp r6, #15
-					beq .Lif2					@;comparacio amb llocs especials
-					add r5, r3					@;+row al desplaçament per anar a la seguent fila
-					ldrb r8, [r4, r5]			@;!*comença punt 3*! r8= tipus gelatina seguent			
-					and r7, r6, #0x00000007		@;r7 mascara per comparar el bits de les gelatines (gelatina actual)
-					and r11, r8, #0x00000007	@;r11=mascara per comparar (gelatina seguent)
-					cmp r7, r11
-					beq .Lgeligual2
-					cmp r8, #0
+					beq .Lif2						
+					add r4, r3						@;+row al desplaçament per anar a la seguent fila
+					ldrb r8, [r5, r4]				@;r8= tipus gelatina seguent			
+					cmp r8, #0						@;comparacio amb gelatina seguent amb llocs especials
 					beq .Lif2
 					cmp r8, #7
 					beq .Lif2
 					cmp r8, #15
-					beq .Lif2	 				@;comparacio amb gelatina seguent amb llocs especials		strb r6, [r4, r5]	,mov r9, r6
-					strb r6, [r4, r5]					@;mov de gelatina actual a r9=actual				sub r5,r3			,mov r10, r8	
-					sub r5, r3					@;mov de gelatina seguent a r10=seguent						strb r8, [r4, r5]	,mov r6, r10
-					strb r8, [r4, r5]			@;																			,mov r8, r9
+					beq .Lif2	 					
+					and r7, r6, #0x00000007			@;r7 mascara per comparar el bits de menor pes de les gelatines (gelatina actual)
+					and r11, r8, #0x00000007		@;r11=mascara per comparar (gelatina seguent)
+					cmp r7, r11						@;comparacio de les gelatines si son igual no intercanviar 
+					beq .Lgeligual2
+					strb r6, [r5, r4]				@;intercanvi gelatina actual al lloc de la seguent
+					sub r4, r3						@;intercanvi gelatina seguent al lloc de l'actual
+					strb r8, [r5, r4]
 					.Lgeligual2:
-					bl detectar_orientacion		@;
+					bl detectar_orientacion			@;crida a la funcio que detecta orientacio en la posicio actual
 					cmp r0, #6
-					bne .Lintercanvi_org_ver					@;si e trobat combinacio ves al final
-					strb r6, [r4, r5]			@;r6=gelatina actual torna al lloc original
-					add r5, r3					@;desplaçament+dim
-					strb r8, [r4, r5]			@;gelatina seguent torna al lloc original
-					sub r5, r3
+					bne .Lintercanvi_org_ver		@;si e trobat combinacio ves al final
+					add r1, #1						
+					bl detectar_orientacion			@;detectar orientacio en la posicio seguent
+					sub r1, #1
+					cmp r0, #6
+					bne .Lintercanvi_org_ver		@;si e trobat combinacio ves al final
+					cmp r7, r11
+					beq .Lif2
+					strb r6, [r5, r4]				@;r6=gelatina actual torna al lloc original
+					add r4, r3						@;desplaçament+dim
+					strb r8, [r5, r4]				@;gelatina seguent torna al lloc original
 					.Lif2:
-					add r2, #1
+					add r2, #1						@;c+1
 					b .Lwhilec2
 				.Lfinwhilec2:
-				add r1, #1
-				mov r2, #0
+				add r1, #1							@;f+1
+				mov r2, #0							@;c=0
 				b .Lwhilef2
-			.Lintercanvi_org_hor:			@;intercanvi en cas de seq trobada al mov. horitzontal
-				mul r5, r1 ,r3
-				add r5, r2	
-				strb r6, [r4, r5]
-				add r5, #1
-				strb r8, [r4, r5]
-				sub r5, #1
+			.Lintercanvi_org_hor:					@;intercanvi en cas de seq trobada al mov. horitzontal per tornar les gelatines al seu lloc original
+				cmp r7, r11
+				beq .Lfi
+				strb r6, [r5, r4]
+				add r4, #1
+				strb r8, [r5, r4]
 				b .Lfi
-			.Lintercanvi_org_ver:			@;intercanvi en cas de seq trobada al mov. vertical
-				mul r5, r1 ,r3
-				add r5, r2	
-				strb r6, [r4, r5]
-				add r5, r3
-				strb r8, [r4, r5]
-				sub r5, r3			
-			.Lfinwhilef2:
-		.Lfi:									@;final final 
+			.Lintercanvi_org_ver:					@;intercanvi en cas de seq trobada al mov. vertical per tornar les gelatines al seu lloc original
+				cmp r7, r11
+				beq .Lfi
+				strb r6, [r5, r4]
+				add r4, r3
+				strb r8, [r5, r4]
+		.Lfi:										@;final 
 		cmp r0, #6
-		beq .Lcanv
-		mov r0, #1
+		beq .Lcanv									
+		mov r0, #1									@;si comb=trobada tornar 1
 		b .Lfinal
 		.Lcanv:
-		mov r0, #0
-		.Lfinal:
+		mov r0, #0									@;si comb=no trobada tornar 0
+		.Lfinal:	
 		pop {r1-r12,pc}
 
 
@@ -189,165 +200,169 @@ hay_combinacion:
 	.global sugiere_combinacion
 sugiere_combinacion:
 		push {r2-r12, lr}
-			mov r5, r0				@;guardar direccio base matriu joc en r5	entre mov r8, r1 i cmp r0, #0 va aixo:bl hay_combinacion
+			mov r5, r0									@;guardar direccio base matriu joc en r5	entre mov r8, r1 i cmp r0, #0 va aixo:bl hay_combinacion
 			mov r8, r1
 			bl hay_combinacion
 			cmp r0, #0
-			beq .Lfi_sug
-				mov r1, #0			@;inicialitzacio fila
-				mov r2, #0			@;inicialitzacio columna
-				mov r3, #6			@;inicializacio cod_ori
-				mov r4, #0			@;inicialitzacio cod_pos_ini
-				mov r6, #0			@;inicialitzacio desplaçament
+			beq .Lfi_sug								@;si no hi ha combinacio sortir del metode
+				mov r1, #0								@;inicialitzacio fila
+				mov r2, #0								@;inicialitzacio columna
+				mov r3, #6								@;inicializacio cod_ori
+				mov r4, #0								@;inicialitzacio cod_pos_ini
+				mov r6, #0								@;inicialitzacio desplaçament
 				mov r10, #ROWS
-				mov r0, #8
-				bl mod_random
-				mov r1, r0		@;r1=f
-				mov r0, #8
-				bl mod_random
-				mov r2, r0		@;r2=c
+				mov r0, #ROWS
+				bl mod_random							@;mod_random per escollir una fila
+				mov r1, r0								@;r1=f
+				mov r0, #COLUMNS
+				bl mod_random							@;mod_random per escollir una columna
+				mov r2, r0								@;r2=c
 				b .Lwhilef_sug
-				.Lrecorregut:
+				.Lrecorregut:							@;si la cerca s'acaba la matriu tornar a començar
 					mov r1, #0
 					mov r2, #0
 				.Lwhilef_sug:
-					cmp r1, #ROWS		@;rows=r10
+					cmp r1, #ROWS						
 					bge .Lfiwhilef_sug
 					.Lwhilec_sug:
-						cmp r2, #COLUMNS		@; columns=r10
-						beq .Lfiwhilec_sug
-						mul r6, r10, r1		@;al cpi=0, cod_ori=1 error en la multiplicacio
+						cmp r2, #COLUMNS				
+						bge .Lfiwhilec_sug
+						mul r6, r10, r1					@;desplaçament en r6
 						add r6, r2
-						ldrb r7, [r5, r6]	@;r7=tipus gelatina actual			
-						cmp r7, #0
+						ldrb r7, [r5, r6]				@;r7=tipus gelatina actual			
+						cmp r7, #0						@;comparacio de r7 amb llocs especials
 						beq .Lfi_gel_esp
 						cmp r7, #7
 						beq .Lfi_gel_esp
 						cmp r7, #15
-						beq .Lfi_gel_esp		@;revisar si es te de comprovar que les gelatines que la rodejen son bloc normals?
-						cmp r1, #0				@;/*Dalt*/
-						beq .Lfi_comprov1		@;saltar al final de comprovar dalt
+						beq .Lfi_gel_esp				@;revisar si es te de comprovar que les gelatines que la rodejen son bloc normals?
+						cmp r1, #0						@;/*Dalt*/
+						beq .Lfi_comprov1				@;saltar al final de comprovar dalt
 							sub r6, r10				
-							ldrb r9, [r5, r6]		@;r9=tipus gelatina seguent
+							ldrb r9, [r5, r6]			@;r9=tipus gelatina seguent
 							cmp r9, #0
-							beq .Lerror_seg1
+							beq .Lerror_seg1			@;comparacio r9 en llocs especials
 							cmp r9, #7
 							beq .Lerror_seg1
 							cmp r9, #15
 							beq .Lerror_seg1
-							and r11, r7, #0x00000007		@;r7 mascara per comparar el bits de les gelatines (gelatina actual)
-							and r12, r9, #0x00000007
-							cmp r11, r12
-							beq .Liguals1	 
-							strb r7, [r5, r6]	@; intercanvi pos de gelatines
+							and r11, r7, #0x00000007	@;r11 mascara per comparar el bits de les gelatines (gelatina actual)
+							and r12, r9, #0x00000007	@;r12=mascara per comparar (gelatina seguent)
+							cmp r11, r12				@;comparacio de les gelatines si son iguals no intercanviar
+							beq .Liguals1	 			
+							strb r7, [r5, r6]			@;intercanvi pos de gelatines
 							add r6, r10
 							strb r9, [r5, r6]
 							.Liguals1:
-							bl detectar_orientacion
+							bl detectar_orientacion		@;detectar orientacio, obtencio del r3=cod_ori
 							mov r3, r0
-							mov r4, #3	
+							mov r4, #3					@;codi_pos_ini=3 (vertical_baix)
 							cmp r11, r12
 							beq .Lerror_seg1
-							strb r7, [r5,r6]
+							strb r7, [r5,r6]			@;tornar les gelatines posicio original
 							sub r6, r10
 							strb r9, [r5, r6]
 							.Lerror_seg1:
 							cmp r3, #6
 							bne .Lfiwhilef_sug			@;s'hi ha seq saltar al final de comprovacio
 						.Lfi_comprov1:
-						cmp r1, #ROWS				@;/*Baix*/
-						beq .Lfi_comprov2		@;saltar al final de comprovar baix
+						mov r12, #ROWS
+						sub r12, #1
+						cmp r1, r12						@;/*Baix*/
+						bge .Lfi_comprov2				@;saltar al final de comprovar baix
 							mul r6, r10, r1
 							add r6, r2
 							ldrb r7, [r5, r6]
 							add r6, r10				
-							ldrb r9, [r5, r6]		@;r9=tipus gelatina seguent
-							cmp r9, #0
-							beq .Lerror_seg2
+							ldrb r9, [r5, r6]			@;r9=tipus gelatina seguent
+							cmp r9, #0	
+							beq .Lerror_seg2			@;comparacio r9 en llocs especials
 							cmp r9, #7
 							beq .Lerror_seg2
 							cmp r9, #15
 							beq .Lerror_seg2
-							and r11, r7, #0x00000007		@;r7 mascara per comparar el bits de les gelatines (gelatina actual)
-							and r12, r9, #0x00000007
+							and r11, r7, #0x00000007	@;r11 mascara per comparar el bits de les gelatines (gelatina actual)
+							and r12, r9, #0x00000007	@;r12=mascara per comparar (gelatina seguent)
 							cmp r11, r12
 							beq .Liguals2
-							strb r7, [r5, r6]		@;inercanvi gelatines
+							strb r7, [r5, r6]			@;inercanvi gelatines
 							sub r6, r10
 							strb r9, [r5, r6]
 							.Liguals2:
-							bl detectar_orientacion
+							bl detectar_orientacion		@;detectar orientacio, obtencio del r3=cod_ori
 							mov r3, r0
-							mov r4, #2	
+							mov r4, #2					@;codi_pos_ini=2 (vertical_dalt)
 							cmp r11, r12
 							beq .Lerror_seg2
-							strb r7, [r5,r6]
+							strb r7, [r5,r6]			@;tornar les gelatines posicio original
 							add r6, r10
 							strb r9, [r5, r6]
 							.Lerror_seg2:
 							cmp r3, #6
 							bne .Lfiwhilef_sug			@;s'hi ha seq saltar al final de comprovacio
 						.Lfi_comprov2:
-						cmp r2, #COLUMNS				@;/*Dreta*/
-						beq .Lfi_comprov3		@;saltar al final de comprovar dreta
+						mov r12, #COLUMNS
+						sub r12, #1
+						cmp r2, r12						@;/*Dreta*/
+						bge .Lfi_comprov3				@;saltar al final de comprovar dreta
 							mul r6, r10, r1
 							add r6, r2
 							ldrb r7, [r5, r6]
 							add r6, #1			
-							ldrb r9, [r5, r6]		@;r9=tipus gelatina seguent
+							ldrb r9, [r5, r6]			@;r9=tipus gelatina seguent
 							cmp r9, #0
-							beq .Lerror_seg3
+							beq .Lerror_seg3			@;comparacio r9 en llocs especials
 							cmp r9, #7
 							beq .Lerror_seg3
 							cmp r9, #15
 							beq .Lerror_seg3
-							and r11, r7, #0x00000007		@;r7 mascara per comparar el bits de les gelatines (gelatina actual)
-							and r12, r9, #0x00000007
+							and r11, r7, #0x00000007	@;r11 mascara per comparar el bits de les gelatines (gelatina actual)
+							and r12, r9, #0x00000007	@;r12=mascara per comparar (gelatina seguent)
 							cmp r11, r12
 							beq .Liguals3
-							strb r7, [r5, r6]		@;intercanvi gelatines 
+							strb r7, [r5, r6]			@;intercanvi gelatines 
 							sub r6, #1
 							strb r9, [r5, r6]
 							.Liguals3:
-							bl detectar_orientacion
+							bl detectar_orientacion		@;detectar orientacio, obtencio del r3=cod_ori
 							mov r3, r0
-							mov r4, #0
+							mov r4, #0					@;codi_pos_ini=0 (horitzontal_esquerra)
 							cmp r11, r12
 							beq .Lerror_seg3
-							strb r7, [r5,r6]
+							strb r7, [r5,r6]			@;tornar les gelatines posicio original
 							add r6, #1
 							strb r9, [r5, r6]
 							.Lerror_seg3:
 							cmp r3, #6
 							bne .Lfiwhilef_sug			@;s'hi ha seq saltar al final de comprovacio
 						.Lfi_comprov3:
-						cmp r2, #0			@;/*Esquerra*/
-						beq .Lfi_comprov4		@;saltar al final de comprovar esquerra
+						cmp r2, #0						@;/*Esquerra*/
+						beq .Lfi_comprov4				@;saltar al final de comprovar esquerra
 							mul r6, r10, r1
 							add r6, r2
 							ldrb r7, [r5, r6]
 							sub r6, #1				
-							ldrb r9, [r5, r6]		@;r9=tipus gelatina seguent
+							ldrb r9, [r5, r6]			@;r9=tipus gelatina seguent
 							cmp r9, #0
-							beq .Lerror_seg4
+							beq .Lerror_seg4			@;comparacio r9 en llocs especials
 							cmp r9, #7
 							beq .Lerror_seg4
 							cmp r9, #15
 							beq .Lerror_seg4
-							and r11, r7, #0x00000007		@;r7 mascara per comparar el bits de les gelatines (gelatina actual)
-							and r12, r9, #0x00000007
+							and r11, r7, #0x00000007	@;r11 mascara per comparar el bits de les gelatines (gelatina actual)
+							and r12, r9, #0x00000007	@;r12=mascara per comparar (gelatina seguent)
 							cmp r11, r12
 							beq .Liguals4
-							strb r7, [r5, r6]		@;inercanvi gelatines
+							strb r7, [r5, r6]			@;inercanvi gelatines
 							add r6, #1
 							strb r9, [r5, r6]
 							.Liguals4:
-							bl detectar_orientacion
+							bl detectar_orientacion		@;detectar orientacio, obtencio del r3=cod_ori
 							mov r3, r0
-							mov r4, #1			
+							mov r4, #1					@;codi_pos_ini=1 (horitzontal_dreta)
 							cmp r11, r12
 							beq .Lerror_seg4
-							strb r7, [r5,r6]
+							strb r7, [r5,r6]			@;tornar les gelatines posicio original
 							sub r6, #1
 							strb r9, [r5, r6]
 							.Lerror_seg4:
@@ -355,19 +370,19 @@ sugiere_combinacion:
 							bne .Lfiwhilef_sug			@;s'hi ha seq saltar al final de comprovacio
 						.Lfi_comprov4:
 						.Lfi_gel_esp:
-						cmp r3, #6					@;mirar si s'ha trobat alguna comb i saltar a generar_pos, sortir bucle
+						cmp r3, #6						@;mirar si s'ha trobat alguna comb, si es aixi sortir del bulce
 						bne .Lfiwhilef_sug
-						add r2, #1
+						add r2, #1						@;c+1
 						b .Lwhilec_sug
-					.Lfiwhilec_sug:
-					add r1, #1
-					mov r2, #0
+					.Lfiwhilec_sug:	
+					add r1, #1							@;f+1
+					mov r2, #0							@;c=0
 					b .Lwhilef_sug
 				.Lfiwhilef_sug:
-				cmp r3, #6
+				cmp r3, #6								@;si s'ha acabat la matriu i no ha trobat comb, saltar al principi del bulce per tornar a començar la cerca en la matriu
 				beq .Lrecorregut
-				mov r0, r8			
-				bl generar_posiciones
+				mov r0, r8								@;recuperar la direccio de memoria del vector de posicions
+				bl generar_posiciones					@;crida a generar posicions
 			.Lfi_sug:
 		pop {r2-r12, pc}
 
@@ -399,265 +414,263 @@ sugiere_combinacion:
 @;		vector de posiciones (x1,y1,x2,y2,x3,y3), devuelto por referencia
 generar_posiciones:
 		push {r1-r12, lr}
-			cmp r4, #0
+			cmp r4, #0							@;si cod_pos_ini==0
 			bne .Lpos1
-				mov r8, #0		@;registre index
-				add r2, #1
-				strb r2, [r0, r8]
+				mov r8, #0						@;r8=registre index del vector de direccions
+				add r2, #1						@;guardar pos_inicial
+				strb r2, [r0, r8]				@;c+1
 				add r8, #1
-				strb r1, [r0, r8]
+				strb r1, [r0, r8]				@;f
 				sub r2, #1
-				cmp r3, #1
+				cmp r3, #1						@;si cod_ori==1
 				bne .Lcod1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c
 					add r1, #1
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f+1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c
 					add r1, #1
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f+2
 					b .Lfi_vec
 				.Lcod1:
-				cmp r3, #2
+				cmp r3, #2						@;si cod_ori==2
 				bne .Lcod2
+					sub r2, #1		
+					add r8, #1
+					strb r2, [r0, r8]			@;c-1
+					add r8, #1
+					strb r1, [r0, r8]			@;f
 					sub r2, #1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c-2
 					add r8, #1
-					strb r1, [r0, r8]
-					sub r2, #1
-					add r8, #1
-					strb r2, [r0, r8]
-					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f
 					b .Lfi_vec
 				.Lcod2:
-				cmp r3, #3
+				cmp r3, #3						@;si cod_ori==3
 				bne .Lcod3
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c
 					sub r1, #1
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f-1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c
 					sub r1, #1
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f-2
 					b .Lfi_vec
 				.Lcod3:
-				cmp r3, #5
+				cmp r3, #5						@;si cod_ori==5
 				bne .Lcod4
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c
 					sub r1, #1
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f-1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c
 					add r1, #2
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f+1
 					b .Lfi_vec
 				.Lcod4:
 			.Lpos1:
-			cmp r4, #1
+			cmp r4, #1							@;si cod_pos_ini==1
 			bne .Lpos2
-				mov r8, #0		@;registre index
-				sub r2, #1
-				strb r2, [r0, r8]
+				mov r8, #0						@;r8=registre index del vector de direccions
+				sub r2, #1						@;@;guardar pos_inicial
+				strb r2, [r0, r8]				@;c-1
 				add r8, #1
-				strb r1, [r0, r8]
-				add r2, #1 @;
-				cmp r3, #0
+				strb r1, [r0, r8]				@;f
+				add r2, #1 
+				cmp r3, #0						@;si cod_ori==0
 				bne .Lcod1_1
 					add r2, #1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c+1
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f
 					add r2, #1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c+2
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f
 					b .Lfi_vec
 				.Lcod1_1:
-				cmp r3, #1
+				cmp r3, #1						@;si cod_ori==1
 				bne .Lcod2_1
 					add r8, #1
-					strb r2, [r0, r8]
-					add r1,#1
-					add r8, #1
-					strb r1, [r0, r8]
-					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c
 					add r1, #1
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f+1
+					add r8, #1
+					strb r2, [r0, r8]			@;c
+					add r1, #1
+					add r8, #1
+					strb r1, [r0, r8]			@;f+2
 					b .Lfi_vec
 				.Lcod2_1:
-				cmp r3, #3
+				cmp r3, #3						@;si cod_ori==3
 				bne .Lcod3_1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c
 					sub r1, #1
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f-1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c
 					sub r1, #1
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f-2
 					b .Lfi_vec
 				.Lcod3_1:
-				cmp r3, #5
+				cmp r3, #5						@;si cod_ori==5
 				bne .Lcod4_1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c
 					sub r1, #1
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f-1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c
 					add r1, #2
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f+1
 					b .Lfi_vec
 				.Lcod4_1:
 			.Lpos2:
-			cmp r4, #2
+			cmp r4, #2							@;si cod_pos_ini==2
 			bne .Lpos3
-				mov r8, #0		@;registre index
-				add r1, #1
-				strb r2, [r0, r8]
+				mov r8, #0						@;r8=registre index del vector de direccions
+				add r1, #1						@;guardar pos_inicial
+				strb r2, [r0, r8]				@;c
 				add r8, #1
-				strb r1, [r0, r8]
+				strb r1, [r0, r8]				@;f+1
 				sub r1, #1
-				cmp r3, #0
+				cmp r3, #0						@;si cod_ori==0
 				bne .Lcod1_2
 					add r2, #1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c+1
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f
 					add r2, #1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c+2
 					add r8, #1
-					strb r1, [r0, r8]
-					b .Lfi_vec
+					strb r1, [r0, r8]			@;f
+					b .Lfi_vec	
 				.Lcod1_2:
-				cmp r3, #2
+				cmp r3, #2						@;si cod_ori==2
 				bne .Lcod2_2
 					sub r2, #1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c-1
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f
 					sub r2, #1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c-2
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f
 					b .Lfi_vec
 				.Lcod2_2:
-				cmp r3, #3
+				cmp r3, #3						@;si cod_ori==3
 				bne .Lcod3_2
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c
 					sub r1, #1
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f-1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c
 					sub r1, #1
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f-2
 					b .Lfi_vec
 				.Lcod3_2:
-				cmp r3, #4
+				cmp r3, #4						@;si cod_ori==4
 				bne .Lcod4_2
 					sub r2, #1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c-1
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f
 					add r2, #2
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c+1
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f
 					b .Lfi_vec
 				.Lcod4_2:
 			.Lpos3:
-			cmp r4, #3
-			bne .Lpos4
-				mov r8, #0		@;registre index
-				strb r2, [r0, r8]
+			cmp r4, #3							@;si cod_pos_ini==3
+			bne .Lpos4							
+				mov r8, #0						@;r8=registre index del vector de direccions @;guardar pos_inicial					
+				strb r2, [r0, r8]				@;c
 				add r8, #1
 				sub r1, #1
-				strb r1, [r0, r8]
+				strb r1, [r0, r8]				@;f-1
 				add r1, #1
-				cmp r3, #0
+				cmp r3, #0						@;si cod_ori==0
 				bne .Lcod1_3
 					add r2, #1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c+1
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f
 					add r2, #1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c+2
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f
 					b .Lfi_vec
 				.Lcod1_3:
-				cmp r3, #1
+				cmp r3, #1						@;si cod_ori==1
 				bne .Lcod2_3
 					add r8, #1
-					strb r2, [r0, r8]
-					add r1,#1
-					add r8, #1
-					strb r1, [r0, r8]
-					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c
 					add r1, #1
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f+1
+					add r8, #1
+					strb r2, [r0, r8]			@;c
+					add r1, #1
+					add r8, #1
+					strb r1, [r0, r8]			@;f+2
 					b .Lfi_vec
 				.Lcod2_3:				
-				cmp r3, #2
+				cmp r3, #2						@;si cod_ori==2
 				bne .Lcod3_3
 					sub r2, #1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c-1
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f
 					sub r2, #1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c-2
 					add r8, #1
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f
 					b .Lfi_vec
 				.Lcod3_3:
-				cmp r3, #4
+				cmp r3, #4						@;si cod_ori==4
 				bne .Lcod4_3
 					sub r2, #1
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c-1
 					add r8, #1
-					add r1, #1 @;dadada
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f
 					add r2, #2
 					add r8, #1
-					strb r2, [r0, r8]
+					strb r2, [r0, r8]			@;c+1
 					add r8, #1
-					add r1, #1 @;dsdsdadas
-					strb r1, [r0, r8]
+					strb r1, [r0, r8]			@;f
 					b .Lfi_vec
 				.Lcod4_3:
 			.Lpos4:
@@ -681,6 +694,7 @@ generar_posiciones:
 @;	Parámetros:
 @;		R1 = fila 'f'
 @;		R2 = columna 'c'
+@;		R5 = matriz de juego
 @;	Resultado:
 @;		R0 = código de orientación;
 @;				inicio de secuencia: 0 -> Este, 1 -> Sur, 2 -> Oeste, 3 -> Norte

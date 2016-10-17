@@ -1,8 +1,8 @@
 @;=                                                         	      	=
 @;=== candy1_move: rutinas para contar repeticiones y bajar elementos ===
 @;=                                                          			=
-@;=== Programador tarea 1E: Aleix.marine@estudiants.urv.cat			  ===
-@;=== Programador tarea 1F: Aleix.marine@estudiants.urv.cat			  ===
+@;=== Programador tarea 1E: aleix.marine@estudiants.urv.cat			  ===
+@;=== Programador tarea 1F: aleix.marine@estudiants.urv.cat			  ===
 @;=                                                         	      	=
 
 
@@ -59,9 +59,9 @@ cuenta_repeticiones:
 		@;Seccio EST
 		.Est:
 		mov r11, #COLUMNS
-		sub r11, #2
+		sub r11, #1
 		cmp r2, r11					@;Comparem amb COLUMNS
-		bgt .Exit					@;Si es mes gran o igual ves a la seccio de sortida
+		bge .Exit					@;Si es mes gran o igual ves a la seccio de sortida
 		add r6, #1 					@;Passem al següent element
 		add r2, #1					@;Modifiquem l'index sumant 1
 		ldrb r8, [r6]				@;Carreguem a r8 el contingut de memoria al que apunta r6 (següent element)
@@ -73,9 +73,9 @@ cuenta_repeticiones:
 		.Sud:
 		@;Seccio SUD
 		mov r11, #ROWS
-		sub r11, #2
+		sub r11, #1
 		cmp r1, r11					@;Comparem amb ROWS
-		bgt .Exit					@;Si es mes gran o igual ves a la seccio de sortida
+		bge .Exit					@;Si es mes gran o igual ves a la seccio de sortida
 		mov r8, #COLUMNS			@;Carreguem el valor de COLUMNS a r8
 		add r6, r8		 			@;Passem al següent element
 		add r1, #1					@;Modifiquem l'index sumant 1
