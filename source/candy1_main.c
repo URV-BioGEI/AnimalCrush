@@ -6,7 +6,7 @@
 	(2º curso de Grado de Ingeniería Informática - ETSE - URV)
 	
 	Analista-programador: santiago.romani@urv.cat
-	Programador 1: cristina.izquierdo@estudiants.urv.cat
+	Programador 1: cristina.izquierdo@estudiants.urv.cat 
 	Programador 2: bernat.bosca@estudiants.urv.cat
 	Programador 3: aleix.marine@estudiants.urv.cat
 	Programador 4: albert.cañellas@estudiants.urv.cat
