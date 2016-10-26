@@ -267,8 +267,8 @@ baja_verticales:
 @;		r10= resultat de la funcio
 baja_laterales:
 		push {r0-r10, lr}
-		mov r1, #9					@;Carreguem index fila
-		mov r2, #9					@;Carreguem index columna
+		mov r1, #ROWS				@;Carreguem index fila
+		mov r2, #COLUMNS			@;Carreguem index columna
 		mla r3, r1, r2, r4			@;Apuntem a la primera posicio valida de la matriu
 		sub r3, #1					@;restem 1 per a corregir
 		.buclewhile:

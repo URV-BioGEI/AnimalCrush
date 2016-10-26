@@ -8,8 +8,8 @@
 
 // Rango de los números de filas y de columnas:
 // mínimo: 3, máximo: 11
-#define ROWS	9						// dimensiones de la matriz de juego
-#define COLUMNS	9
+#define ROWS	6						// dimensiones de la matriz de juego
+#define COLUMNS	8
 #define DFIL	(24-ROWS*2)				// desplazamiento vertical de filas
 
 #define MAXLEVEL	9					// nivel màximo (niveles 0..MAXLEVEL-1)
