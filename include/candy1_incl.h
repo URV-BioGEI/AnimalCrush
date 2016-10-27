@@ -35,8 +35,8 @@ extern int contar_gelatinas(char mat[][COLUMNS]);
 extern void retardo(int dsecs);
 extern int procesar_touchscreen(char mat[][COLUMNS],
 									int *p1X, int *p1Y, int *p2X, int *p2Y);
-extern void oculta_elementos(char mat[][COLUMNS]);
-extern void muestra_elementos(char mat[][COLUMNS]);
+extern void aumentar_elementos(char mat[][COLUMNS]);
+extern void reducir_elementos(char mat[][COLUMNS]);
 extern void intercambia_posiciones(char mat[][COLUMNS],
 										int p1X, int p1Y, int p2X, int p2Y);
 extern int calcula_puntuaciones(char mar[][COLUMNS]);
