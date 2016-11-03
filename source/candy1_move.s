@@ -172,10 +172,10 @@ baja_elementos:
 @; 		r10 = emmagatzema si hi ha hagut moviments (r0 esta en ús tota l'estona per mod random)
 baja_verticales:
 		push {r1-r11, lr}
+		@;add r4, #COLUMNS				Factor de correcció: La vista de la nds i la posicio en memoria de la matriu es troben desplaçades una fila
 		mov r10, #0						@;No haurem fet cap moviment fins que no es faci el contrari
 		mov r1, #ROWS					@;Carreguem index files
-		mov r2, #COLUMNS				@;Carreguem index columnes
-		mov r4, r0						@;Utilitzarem r4 com a contenidor de la direccio base de la matriu						
+		mov r2, #COLUMNS				@;Carreguem index columnes				
 		mla r3, r1, r2, r4				@;Anem a l'ultima posicio per tant, els index son els valors de les constants
 		sub r3, #1						@;Restem 1 per a ajustar (sen va una casella mes enlla de lultima posicio de la matriu)
 		@;BUCLE DE RECORREGUT DE LA MATRIU
@@ -267,8 +267,9 @@ baja_verticales:
 @;		r10= resultat de la funcio
 baja_laterales:
 		push {r0-r10, lr}
-		mov r1, #ROWS				@;Carreguem index fila
-		mov r2, #COLUMNS			@;Carreguem index columna
+		mov r1, #ROWS					@;Carreguem index fila
+		mov r2, #COLUMNS				@;Carreguem index columna	
+		mov r10, #0						@;No haurem fet cap moviment fins que no es faci el contrari
 		mla r3, r1, r2, r4			@;Apuntem a la primera posicio valida de la matriu
 		sub r3, #1					@;restem 1 per a corregir
 		.buclewhile:

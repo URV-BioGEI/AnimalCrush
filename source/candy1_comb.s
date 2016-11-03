@@ -47,7 +47,7 @@ hay_combinacion:
 					bge .Lfinwhilec1
 					cmp r0, #6
 					bne .Lfi
-					mul r4, r1 ,r3
+					mul r4, r1 ,r12
 					add r4, r2						@;r4=desplaçament(rows*f+c)
 					ldrb r6, [r5, r4]				@;r6= tipus de gelatina actual
 					cmp r6, #0						@;comparacio amb llocs especials a gelatina actual
@@ -110,7 +110,7 @@ hay_combinacion:
 					bge .Lfinwhilec2
 					cmp r0, #6
 					bne .Lfi
-					mul r4, r1 ,r3
+					mul r4, r1 ,r12
 					add r4, r2						@;r4=desplaçament(rows*f+c)
 					ldrb r6, [r5, r4]				@;r6= tipus de gelatina actual
 					cmp r6, #0						@;comparacio amb llocs especials
@@ -119,7 +119,7 @@ hay_combinacion:
 					beq .Lif2
 					cmp r6, #15
 					beq .Lif2						
-					add r4, r3						@;+row al desplaçament per anar a la seguent fila
+					add r4, r12						@;+row al desplaçament per anar a la seguent fila
 					ldrb r8, [r5, r4]				@;r8= tipus gelatina seguent			
 					cmp r8, #0						@;comparacio amb gelatina seguent amb llocs especials
 					beq .Lif2
@@ -132,7 +132,7 @@ hay_combinacion:
 					cmp r7, r11						@;comparacio de les gelatines si son igual no intercanviar 
 					beq .Lgeligual2
 					strb r6, [r5, r4]				@;intercanvi gelatina actual al lloc de la seguent
-					sub r4, r3						@;intercanvi gelatina seguent al lloc de l'actual
+					sub r4, r12						@;intercanvi gelatina seguent al lloc de l'actual
 					strb r8, [r5, r4]
 					.Lgeligual2:
 					bl detectar_orientacion			@;crida a la funcio que detecta orientacio en la posicio actual
@@ -146,7 +146,7 @@ hay_combinacion:
 					cmp r7, r11
 					beq .Lif2
 					strb r6, [r5, r4]				@;r6=gelatina actual torna al lloc original
-					add r4, r3						@;desplaçament+dim
+					add r4, r12						@;desplaçament+dim
 					strb r8, [r5, r4]				@;gelatina seguent torna al lloc original
 					.Lif2:
 					add r2, #1						@;c+1
@@ -166,7 +166,7 @@ hay_combinacion:
 				cmp r7, r11
 				beq .Lfi
 				strb r6, [r5, r4]
-				add r4, r3
+				add r4, r12
 				strb r8, [r5, r4]
 		.Lfi:										@;final 
 		cmp r0, #6
@@ -210,7 +210,7 @@ sugiere_combinacion:
 				mov r3, #6								@;inicializacio cod_ori
 				mov r4, #0								@;inicialitzacio cod_pos_ini
 				mov r6, #0								@;inicialitzacio desplaçament
-				mov r10, #ROWS
+				mov r10, #COLUMNS
 				mov r0, #ROWS
 				bl mod_random							@;mod_random per escollir una fila
 				mov r1, r0								@;r1=f
