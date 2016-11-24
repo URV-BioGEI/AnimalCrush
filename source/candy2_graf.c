@@ -147,7 +147,7 @@ void init_grafA()
 		//	bit 12 = 1		->	OBJ 2nd target pixel
 	*/
 	*((u16 *) 0x04000050) = 0x1846;	// 0001100001000110
-	/* factor de "blending" (mezcla):
+	/* factor de "blending" (mezcla): 
 		//	bits  4..0 = 01001	-> EVA coefficient (1st target)
 		//	bits 12..8 = 00111	-> EVB coefficient (2nd target)
 	*/
