@@ -5,10 +5,10 @@
 	Funciones de inicialización de gráficos (ver 'candy2_main.c')
 
 	Analista-programador: santiago.romani@urv.cat
-	Programador tarea 2A: xxx.xxx@estudiants.urv.cat
-	Programador tarea 2B: yyy.yyy@estudiants.urv.cat
-	Programador tarea 2C: zzz.zzz@estudiants.urv.cat
-	Programador tarea 2D: uuu.uuu@estudiants.urv.cat
+	Programador tarea 2A: Aleix.Marine@estudiants.urv.cat
+	Programador tarea 2B: bernat.bosca@estudiants.urv.cat
+	Programador tarea 2C: albert.canelon@estudiants.urv.cat
+	Programador tarea 2D: Cristina.izquierdo@estudiants.urv.cat
 
 ------------------------------------------------------------------------------*/
 #include <nds.h>
@@ -31,11 +31,27 @@ gelatina mat_gel[ROWS][COLUMNS];	// matriz de gelatinas
 	por parámetro (independientemente de los códigos de gelatinas).*/
 void genera_sprites(char mat[][COLUMNS])
 {
-
-
+	int i;
+	SPR_ocultarSprites(128);
+	for (i=0; i<128; i++)
+	{
+		SPR_fijarPrioridad(i,1);
+	}
+	for (int j=0; j<ROWS; i++)
+	{
+		for (i=0; i<COLUMNS; i++)
+		{
+			if (mat[i][j]>0&&mat[i][j]<7&&mat[i][j]>8&&mat[i][j]<15&&mat[i][j]>16)
+			{
+				crea_elemento(1, i, j);
+				n_sprites++;
+			}
+		}
+	}
+	swiWaitForVBlank();
+	SPR_actualizarSprites((u16 *)vect_elem,128);
+	
 }
-
-
 
 // TAREA 2Bb
 /* genera_mapa2(*mat): generar un mapa de baldosas como un tablero ajedrezado
@@ -91,8 +107,8 @@ void init_grafA()
 	videoSetMode(MODE_3_2D | DISPLAY_SPR_1D_LAYOUT | DISPLAY_SPR_ACTIVE);
 	
 // Tarea 2Aa:
-	// reservar banco F para sprites, a partir de 0x06400000
-
+	// reservar banco F para sprites, a partir de 0x06400000								
+	vramSetBankF(VRAM_F_MAIN_SPRITE_0x06400000);				//Assigna el banc F com a contenidor principal dels sprites a partir de 0x06400000
 // Tareas 2Ba y 2Ca:
 	// reservar banco E para fondos 1 y 2, a partir de 0x06000000
 
@@ -107,8 +123,9 @@ void init_grafA()
 	// dirección virtual de memoria gráfica para sprites, y cargar los colores
 	// de paleta asociados contenidos en  la variable SpritesPal[]
 
-
-
+	//dmaCopy(SpritesTiles, , sizeof(SpritesTiles));
+	dmaCopy(SpritesPal, BG_PALETTE, sizeof(SpritesPal));
+	
 // Tarea 2Ba:
 	// inicializar el fondo 2 con prioridad 2
 
