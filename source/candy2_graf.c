@@ -92,7 +92,7 @@ void init_grafA()
 	
 // Tarea 2Aa:
 	// reservar banco F para sprites, a partir de 0x06400000
-
+	
 // Tareas 2Ba y 2Ca:
 	// reservar banco E para fondos 1 y 2, a partir de 0x06000000
 
