@@ -46,8 +46,19 @@ rsi_vblank:
 
 
 @;Tarea 2Ha
-
-		
+	
+	ldr r1, =update_bg3
+	ldr r2, [r1]
+	cmp r2, #0
+	beq .Lfi2ha
+	ldr r3, =offsetBG3X
+	ldr r4, [r3]
+	and r4, #0x00FF
+	ldr r3, =BG3X
+	strb r4, [r4]
+	mov r2, #0
+	str r2, [r1]
+	.Lfi2ha:	
 		pop {pc}
 
 

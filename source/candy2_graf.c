@@ -74,6 +74,12 @@ void genera_mapa1(char mat[][COLUMNS])
 void ajusta_imagen3(int ibg)
 {
 
+	int angle=0;
+	bgSetCenter(ibg, 256, 128);
+	angle=degreesToAngle(90);
+	bgSetRotate(ibg, angle);
+	bgSetScroll(ibg, 256, 128);
+	bgUpdate();
 
 }
 
@@ -98,9 +104,14 @@ void init_grafA()
 
 // Tarea 2Da:
 	// reservar bancos A y B para fondo 3, a partir de 0x06020000
-
-
-
+	
+	vramSetBankA(VRAM_A_MAIN_BG_0x06020000);							//Inicialitzacio de VRAM_A
+	vramSetBankA(VRAM_B_MAIN_BG_0x06020000);							//Inicialitzacio de VRAM_B
+	bg3A = bgInit(3, BgType_ExRotation, BgSize_T_512x256, 0, 1);		//Inicialitzar fondo
+	bgSetPriority(bg3A, 3);												//Prioridad fondo
+	decompress(FondoBitmap, bgGetGfxPtr(bg3A), LZ77Vram);				//Cargar pixeles
+	ajusta_imagen3(3);
+	
 
 // Tarea 2Aa:
 	// cargar las baldosas de la variable SpritesTiles[] a partir de la
