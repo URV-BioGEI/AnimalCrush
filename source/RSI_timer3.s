@@ -1,7 +1,7 @@
 @;=                                                          	     	=
 @;=== RSI_timer3.s: rutinas para desplazar el fondo 3 (imagen bitmap) ===
 @;=                                                           	    	=
-@;=== Programador tarea 2H: xxx.xxx@estudiants.urv.cat				  ===
+@;=== Programador tarea 2H: albert.canellas@estudiants.urv.cat		  ===
 @;=                                                       	        	=
 
 .include "../include/candy2_incl.i"
@@ -11,13 +11,13 @@
 .data
 		.align 2
 		.global update_bg3
-	update_bg3:	.hword	0			@;1 -> actualizar fondo 3
+	update_bg3:	.hword	0				@;1 -> actualizar fondo 3
 		.global timer3_on
-	timer3_on:	.hword	0 			@;1 -> timer3 en marcha, 0 -> apagado
+	timer3_on:	.hword	0 				@;1 -> timer3 en marcha, 0 -> apagado
 		.global offsetBG3X
-	offsetBG3X: .hword	0			@;desplazamiento vertical fondo 3
-	sentidBG3X:	.hword	0			@;sentido desplazamiento (0-> inc / 1-> dec)
-	divFreq3: .hword	1			@;divisor de frecuencia para timer 3
+	offsetBG3X: .hword	0				@;desplazamiento vertical fondo 3
+	sentidBG3X:	.hword	0				@;sentido desplazamiento (0-> inc / 1-> dec)
+	divFreq3: .hword	-3272,85		@;divisor de frecuencia para timer 3
 	
 
 
@@ -31,20 +31,35 @@
 @;activa_timer3(); rutina para activar el timer 3.
 	.global activa_timer3
 activa_timer3:
-		push {lr}
-		
-		
-		pop {pc}
+		push {r1-r4, lr}
+			ldr r1, =timer3_on			@;ficar timer3_on a 1
+			ldrh r2, [r1]
+			mov r2, #1
+			strh r2, [r1]
+			ldr r1, =divFreq3			@;DIV FREQ
+			ldrh r2, [r1]
+			ldr r3, =0x0400010C			@;guardar freq en timer3_data
+			str r2, [r3]
+			ldr r3, =0x0400010E			@;timer3_cR
+			ldr r4, [r3]
+			and r4, #0xC3				@;mascara 1100 0011 per activar el timer i def freq
+			str r4, [r3]
+		pop {r1-r4, pc}
 
 
 @;TAREA 2Hc;
 @;desactiva_timer3(); rutina para desactivar el timer 3.
 	.global desactiva_timer3
 desactiva_timer3:
-		push {lr}
-		
-		
-		pop {pc}
+		push {r0, r1,lr}
+			ldr r0, =timer3_on
+			mov r1, #0
+			str r1, [r0] 				@;Deactivem timer0_on
+			ldr r0, =0x0400010E			@;0x0400010E	Timer3_control
+			ldrh r1, [r0]
+			bic r1, #128				@;Posem bit 7 a 0 (desactiva timer) 1000 0000
+			strh r1, [r0]				@;Guardem al registre de control
+		pop {r0, r1,pc}
 
 
 
@@ -57,10 +72,28 @@ desactiva_timer3:
 @;	registro de control del fondo correspondiente.
 	.global rsi_timer3
 rsi_timer3:
-		push {lr}
-		
-		
-		pop {pc}
+		push {r1-r6, lr}
+			ldr r1, =sentidBG3X
+			ldrh r2, [r1]
+			ldr r3, =offsetBG3X
+			ldrh r4, [r3]
+			cmp r4, #320				@;comparar amb el limit inferior 
+			moveq r2, #1				@;com no podem baixar mes canviem de sentit a 1
+			cmp r4, #0					@;comparar amb el limit superior
+			moveq r2, #0				@;com no podem pujar mes canviem el sentita a 0
+			cmp r2, #0	
+			bne .Lno_incrementar
+			add r4, #1					@;si sentit es 0 incrementar
+			strh r4, [r3]
+			b .Lfigir
+			.Lno_incrementar:
+			sub r4, #1					@;si sentit es 1 decrementar
+			strh r4, [r3]
+			.Lfigir:
+			ldr r5, =update_bg3
+			mov r6, #1
+			strh r6, [r5]
+		pop {r1-r6, pc}
 
 
 

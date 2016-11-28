@@ -1,7 +1,7 @@
 @;=                                                          	     	=
 @;=== RSI_timer2.s: rutinas para animar las gelatinas (metabaldosas)  ===
 @;=                                                           	    	=
-@;=== Programador tarea 2G: xxx.xxx@estudiants.urv.cat				  ===
+@;=== Programador tarea 2G: cristina.izquierdo@estudiants.urv.cat	  ===
 @;=                                                       	        	=
 
 .include "../include/candy2_incl.i"

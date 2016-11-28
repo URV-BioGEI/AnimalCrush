@@ -1,8 +1,8 @@
 @;=                                                               		=
 @;=== candy1_combi.s: rutinas para detectar y sugerir combinaciones   ===
 @;=                                                               		=
-@;=== Programador tarea 1G: albert.cañellas@estudiants.urv.cat				  ===
-@;=== Programador tarea 1H: albert.cañellas@estudiants.urv.cat				  ===
+@;=== Programador tarea 1G: albert.cañellas@estudiants.urv.cat		  ===
+@;=== Programador tarea 1H: albert.cañellas@estudiants.urv.cat		  ===
 @;=                                                             	 	=
 
 

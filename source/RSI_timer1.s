@@ -1,7 +1,7 @@
 @;=                                                          	     	=
 @;=== RSI_timer1.s: rutinas para escalar los elementos (sprites)	  ===
 @;=                                                           	    	=
-@;=== Programador tarea 2F: xxx.xxx@estudiants.urv.cat				  ===
+@;=== Programador tarea 2F: bernat.bosca@estudiants.urv.cat			  ===
 @;=                                                       	        	=
 
 .include "../include/candy2_incl.i"

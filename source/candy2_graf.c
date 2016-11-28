@@ -7,8 +7,8 @@
 	Analista-programador: santiago.romani@urv.cat
 	Programador tarea 2A: Aleix.Marine@estudiants.urv.cat
 	Programador tarea 2B: bernat.bosca@estudiants.urv.cat
-	Programador tarea 2C: albert.canelon@estudiants.urv.cat
-	Programador tarea 2D: Cristina.izquierdo@estudiants.urv.cat
+	Programador tarea 2C: Cristina.izquierdo@estudiants.urv.cat
+	Programador tarea 2D: albert.canelon@estudiants.urv.cat
 
 ------------------------------------------------------------------------------*/
 #include <nds.h>
@@ -31,26 +31,31 @@ gelatina mat_gel[ROWS][COLUMNS];	// matriz de gelatinas
 	por parámetro (independientemente de los códigos de gelatinas).*/
 void genera_sprites(char mat[][COLUMNS])
 {
-	int i;
-	SPR_ocultarSprites(128);
-	for (i=0; i<128; i++)
+	int i,j;
+	
+	for (i=0; i<ROWS*COLUMNS; i++)
 	{
-		SPR_fijarPrioridad(i,1);
+		vect_elem[i].ii=-1;
 	}
-	for (int j=0; j<ROWS; i++)
+	SPR_ocultarSprites(128);
+	for (int i=0; i<ROWS; i++)
 	{
-		for (i=0; i<COLUMNS; i++)
+		for (j=0; j<COLUMNS; j++)
 		{
-			if (mat[i][j]>0&&mat[i][j]<7&&mat[i][j]>8&&mat[i][j]<15&&mat[i][j]>16)
+			if ((mat[i][j]>0 && mat[i][j]<7) || (mat[i][j]>8 && mat[i][j]<15) || mat[i][j]>16)
 			{
-				crea_elemento(1, i, j);
+				
+				crea_elemento(mat[i][j]&0x7, i, j);
 				n_sprites++;
 			}
 		}
 	}
+	for (i=0; i<ROWS*COLUMNS; i++)
+	{
+		SPR_fijarPrioridad(i,1);
+	}
 	swiWaitForVBlank();
-	SPR_actualizarSprites((u16 *)vect_elem,128);
-	
+	SPR_actualizarSprites(OAM,128);
 }
 
 // TAREA 2Bb
@@ -89,8 +94,12 @@ void genera_mapa1(char mat[][COLUMNS])
 	de la pantalla. */
 void ajusta_imagen3(int ibg)
 {
-
-
+	int angle=0;
+	bgSetCenter(ibg, 256, 128);
+	angle=degreesToAngle(-90);
+	bgSetRotate(ibg, angle);
+	bgSetScroll(ibg, 140, 0);
+	bgUpdate();
 }
 
 
@@ -102,19 +111,24 @@ void ajusta_imagen3(int ibg)
 				generando el fondo 3 y fijando la transparencia entre fondos.*/
 void init_grafA()
 {
-	int bg1A, bg2A, bg3A;
+	int bg3A; //bg1A bg2A, 
 
-	videoSetMode(MODE_3_2D | DISPLAY_SPR_1D_LAYOUT | DISPLAY_SPR_ACTIVE);
+	videoSetMode(MODE_3_2D | DISPLAY_BG3_ACTIVE |DISPLAY_SPR_1D_LAYOUT | DISPLAY_SPR_ACTIVE);
 	
 // Tarea 2Aa:
 	// reservar banco F para sprites, a partir de 0x06400000								
-	vramSetBankF(VRAM_F_MAIN_SPRITE_0x06400000);				//Assigna el banc F com a contenidor principal dels sprites a partir de 0x06400000
+		vramSetBankF(VRAM_F_MAIN_SPRITE_0x06400000);				//Assigna el banc F com a contenidor principal dels sprites a partir de 0x06400000
 // Tareas 2Ba y 2Ca:
 	// reservar banco E para fondos 1 y 2, a partir de 0x06000000
 
 // Tarea 2Da:
 	// reservar bancos A y B para fondo 3, a partir de 0x06020000
-
+	vramSetBankA(VRAM_A_MAIN_BG_0x06020000);							//Inicialitzacio de VRAM_A
+	vramSetBankB(VRAM_B_MAIN_BG_0x06040000);							//Inicialitzacio de VRAM_B
+	bg3A = bgInit(3, BgType_Bmp16, BgSize_B16_512x256, 8, 0);			//Inicialitzar fondo
+	bgSetPriority(bg3A, 3);												//Prioridad fondo
+	decompress(FondoBitmap, bgGetGfxPtr(bg3A), LZ77Vram);				//Cargar pixeles
+	ajusta_imagen3(3);
 
 
 
@@ -122,10 +136,8 @@ void init_grafA()
 	// cargar las baldosas de la variable SpritesTiles[] a partir de la
 	// dirección virtual de memoria gráfica para sprites, y cargar los colores
 	// de paleta asociados contenidos en  la variable SpritesPal[]
-
-	//dmaCopy(SpritesTiles, , sizeof(SpritesTiles));
-	dmaCopy(SpritesPal, BG_PALETTE, sizeof(SpritesPal));
-	
+		dmaCopy(SpritesTiles, (unsigned int *)0X06400000, sizeof(SpritesTiles)); // copiar baldosas a 0x06400000=SPRITE_GFX, por tanto el desplazamiento de baldosas = 0 cuando bg init,
+		dmaCopy(SpritesPal, (unsigned int *) 0x05000200, sizeof(SpritesPal));	//  Sprite Palette display engine A =0x05000200 = SPRITE_PALETTE
 // Tarea 2Ba:
 	// inicializar el fondo 2 con prioridad 2
 
