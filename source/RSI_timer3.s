@@ -31,20 +31,17 @@
 @;activa_timer3(); rutina para activar el timer 3.
 	.global activa_timer3
 activa_timer3:
-		push {r1-r4, lr}
+		push {r1-r5, lr}
 			ldr r1, =timer3_on			@;ficar timer3_on a 1
 			ldrh r2, [r1]
 			mov r2, #1
 			strh r2, [r1]
-			ldr r1, =divFreq3			@;DIV FREQ
-			ldrh r2, [r1]
-			ldr r3, =0x0400010C			@;guardar freq en timer3_data
-			str r2, [r3]
-			ldr r3, =0x0400010E			@;timer3_cR
-			ldr r4, [r3]
-			and r4, #0xC3				@;mascara 1100 0011 per activar el timer i def freq
-			str r4, [r3]
-		pop {r1-r4, pc}
+			ldr r3, =divFreq3			@;DIV FREQ
+			ldrh r4, [r3]
+			ldr r5, =0x0400010C			@;guardar freq en timer3_data
+			orr r4, #0x00C30000				@;mascara 1100 0011 per activar el timer i def freq
+			str r4, [r5]
+		pop {r1-r5, pc}
 
 
 @;TAREA 2Hc;

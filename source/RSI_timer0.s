@@ -59,7 +59,7 @@ rsi_vblank:
 			ldr r4, [r3]
 			@;.type U32.F32 r4 {, #8}			@;format coma fixe 0.8.8 ??????
 			ldr r3, =0x04000038					@;REG_BG3X --> 0.20.8	/	REG_BG3PA, REG_BG3PB, REG_BG3PC i REG_BG3PD --> 0.8.8
-			strb r5, [r3]
+			strb r4, [r3]
 			mov r2, #0
 			str r2, [r1]
 			.End: 
