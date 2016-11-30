@@ -37,11 +37,11 @@
 @;Tarea 2H: actualiza el desplazamiento del fondo 3
 	.global rsi_vblank
 rsi_vblank:
-		push {lr}
+		push {r0-r4,lr}
 			ldr r0, =update_spr			@;r0=@update_spr
 			ldrh r1, [r0]				@;r1=update_spr
 			cmp r1, #0
-			beq .End					@;Si es 0 (no s'han mogut els sprites), surt
+			beq .Ends					@;Si es 0 (no s'han mogut els sprites), surt
 			bl SPR_actualizarSprites	@; sino actualitza els sprites
 			mov r0, #0					@; carrega un 0
 			strh r0, [r0]				@; i guarda'l
@@ -54,7 +54,7 @@ rsi_vblank:
 			ldr r1, =update_bg3
 			ldr r2, [r1]
 			cmp r2, #0
-			beq .End
+			beq .Ends
 			ldr r3, =offsetBG3X
 			ldr r4, [r3]
 			@;.type U32.F32 r4 {, #8}			@;format coma fixe 0.8.8 ??????
@@ -62,8 +62,8 @@ rsi_vblank:
 			strb r4, [r3]
 			mov r2, #0
 			str r2, [r1]
-			.End: 
-		pop {pc}
+			.Ends: 
+		pop {r0-r4, pc}
 
 
 
@@ -157,17 +157,17 @@ rsi_timer0:
 			bne .b					@;Torna a iterar
 			cmp r4, #1				@;Si flag de moviment es 0
 			blne desactiva_timer0	@;Desactiva timer 0 per a quan no hi ha moviment
-			bne .End				@;I surt
+			bne .fin				@;I surt
 			ldr r0, =update_spr		@;Sino carrega update_spr=r0
 			mov r1, #1				@;R1 = 1
 			strh r1, [r0]			@;Activa-la guardant un 1
 			ldr r1, =0x04000100 	@;R1 = @timer0 data
 			ldrh r0, [r1]			@;R0 = timer0_data
 			cmp r0, #-128			@;Si r0 (div freq) major que -128
-			bge .End				@;Surt
+			bge .fin				@;Surt
 			add r0, #10				@;i sino Suma 10 (valor a modificar al fer proves), això disminuirà el valor del div_fre, ja que es negatiu
 			strh r0, [r1]			@;Guarda'l
-			.End
+			.fin:
 		pop {r0-r5, pc}
 
 

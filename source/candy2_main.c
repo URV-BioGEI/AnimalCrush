@@ -94,8 +94,8 @@ int main(void)
 	{
 		if (initializing)		//////	SECCIÓN DE INICIALIZACIÓN	//////
 		{
-			inicializa_matriz(matrix, level);
-			//copia_mapa(matrix, 8);
+			//inicializa_matriz(matrix, level);
+			copia_mapa(matrix, 0);
 			genera_sprites(matrix);
 			genera_mapa1(matrix);
 			genera_mapa2(matrix);
@@ -141,7 +141,7 @@ int main(void)
 				}
 				else change = 1;				// sino, revisar estado matriz
 			}
-			escribe_matriz(matrix);			// visualiza bajadas o eliminaciones
+			//escribe_matriz(matrix);			// visualiza bajadas o eliminaciones
 		}
 		else					//////	SECCIÓN DE JUGADAS	//////
 		{

@@ -267,9 +267,9 @@ baja_verticales:
 @;		r10= resultat de la funcio
 baja_laterales:
 		push {r0-r10, lr}
-		mov r1, #ROWS					@;Carreguem index fila
-		mov r2, #COLUMNS				@;Carreguem index columna	
-		mov r10, #0						@;No haurem fet cap moviment fins que no es faci el contrari
+		mov r1, #ROWS				@;Carreguem index fila
+		mov r2, #COLUMNS			@;Carreguem index columna	
+		mov r10, #0					@;No haurem fet cap moviment fins que no es faci el contrari
 		mla r3, r1, r2, r4			@;Apuntem a la primera posicio valida de la matriu
 		sub r3, #1					@;restem 1 per a corregir
 		.buclewhile:
@@ -288,10 +288,10 @@ baja_laterales:
 		cmp r8, #7					@;comparem amb 7
 		beq .comprovadret			@;si no pots comprova lelement de la dreta
 		cmp r8, #0					@;compara amb el 0 per a saber si lelement esta buit
-		addne r9, r9, #1			@;Afegeix al flag un 1
+		addne r9, r9, #1			@;Afegeix al flag un 1 si l'element pot moure's
 		.comprovadret:
 		cmp r2, #COLUMNS			@;mira si estas al limit dret de la matriu
-		beq .fi						@;tractem l'element esquerra
+		beq .fi						@;sortim directament si estem al limit
 		sub r5, r3, #COLUMNS		@;Restar columnes
 		add r5, r5, #1				@;Afegim 1 a l'index per 
 		ldrb r8, [r5]				@;carrega la posicio de la dreta
@@ -308,13 +308,20 @@ baja_laterales:
 		cmp r9, #0					@;Compara amb 0 el flag
 		beq .passaseguent			@;passa al seguent si no hi ha cap element susceptible de per baixat
 		@;SECCIO D'ELECCIO ALEATORIA
-		@; Llavors el flag es 9 i podem baixar pels dos llocs, per tant generem laleatori
+		@; Llavors el flag es 3 i podem baixar pels dos llocs, per tant generem laleatori
 		mov r0, #1					@;Carreguem un 1 a r0 (per a passar parametre)
 		bl mod_random				@;cridem mod random
 		cmp r0, #0					@;Si no es 0			
 		bne .Dreta					@;Anem a la dreta arbitrariament
 		@;SECCIO ESQUERRA
 		.Esquerra:
+		push {r0-r3}
+		mov r0, r1					@;R0=fila
+		mov r1, r2					@;R1=columna
+		sub r2, r0, #1				@;R2=fila destí
+		sub r3, r1, #1				@;R3=columna destí
+		bl activa_elemento
+		pop {r0-r3}
 		sub r5, r3, #COLUMNS		@;Restar columnes
 		sub r5, r5, #1				@;restem 1 per a ajustar
 		ldrb r8, [r5]				@;Carregar a r8 el contingut de la posicio que sha de moure
@@ -327,6 +334,13 @@ baja_laterales:
 		b .passaseguent				@;Sortim
 		@;SECCIO DRETA
 		.Dreta:
+		push {r0-r3}
+		mov r0, r1					@;R0=fila
+		mov r1, r2					@;R1=columna
+		sub r2, r0, #1				@;R2=fila destí
+		add r3, r1, #1				@;R3=columna destí
+		bl activa_elemento
+		pop {r0-r3}
 		sub r5, r3, #COLUMNS		@;Restar columnes
 		add r5, r5, #1				@;sumem 1 per a ajustar
 		ldrb r8, [r5]				@;Carregar a r8 el contingut de la posicio que sha de moure
