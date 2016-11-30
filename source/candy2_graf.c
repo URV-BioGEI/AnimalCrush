@@ -7,7 +7,7 @@
 	Analista-programador: santiago.romani@urv.cat
 	Programador tarea 2A: Aleix.Marine@estudiants.urv.cat
 	Programador tarea 2B: bernat.bosca@estudiants.urv.cat
-	Programador tarea 2C: Cristina.izquierdo@estudiants.urv.cat
+	Programador tarea 2C: cristina.izquierdo@estudiants.urv.cat
 	Programador tarea 2D: albert.canelon@estudiants.urv.cat
 
 ------------------------------------------------------------------------------*/
@@ -111,7 +111,7 @@ void ajusta_imagen3(int ibg)
 				generando el fondo 3 y fijando la transparencia entre fondos.*/
 void init_grafA()
 {
-	int bg3A; //bg1A bg2A, 
+	int bg3A, bg1A, bg2A; 
 
 	videoSetMode(MODE_3_2D | DISPLAY_BG3_ACTIVE |DISPLAY_SPR_1D_LAYOUT | DISPLAY_SPR_ACTIVE);
 	
@@ -120,6 +120,12 @@ void init_grafA()
 		vramSetBankF(VRAM_F_MAIN_SPRITE_0x06400000);				//Assigna el banc F com a contenidor principal dels sprites a partir de 0x06400000
 // Tareas 2Ba y 2Ca:
 	// reservar banco E para fondos 1 y 2, a partir de 0x06000000
+		vramSetBankE(VRAM_E_MAIN_BG);											//inicialitzacio de VRAM_E
+		bg1A = bgInit(1, BgType_Text8bpp, BgSize_T_256x256, 1, 0); 			//Inicialitzar fondo 1 "text" (bg1) 8bpp 32x32
+		bgSetPriority(bg1A, 0);													//Priridat fondo 1 a nivell 0
+		decompress(BaldosasTiles, (unsigned int *)0x06000000, LZ77Vram);		//cargar baldosas 
+		dmaCopy(BaldosasPal, (unsigned int *)0X05000000, sizeof(BaldosasPal));			//cargar paleta
+		
 
 // Tarea 2Da:
 	// reservar bancos A y B para fondo 3, a partir de 0x06020000

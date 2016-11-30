@@ -8,7 +8,7 @@
 	Analista-programador: santiago.romani@urv.cat
 	Programador 1: Aleix.Marine@estudiants.urv.cat
 	Programador 2: bernat.bosca@estudiants.urv.cat
-	Programador 3: Cristina.izquierdo@estudiants.urv.cat
+	Programador 3: cristina.izquierdo@estudiants.urv.cat
 	Programador 4: albert.canelon@estudiants.urv.cat
 
 ------------------------------------------------------------------------------*/
