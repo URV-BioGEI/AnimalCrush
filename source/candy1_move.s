@@ -317,7 +317,9 @@ baja_laterales:
 		.Esquerra:
 		push {r0-r3}
 		mov r0, r1					@;R0=fila
+		sub r0, #1
 		mov r1, r2					@;R1=columna
+		sub r1, #1
 		sub r2, r0, #1				@;R2=fila destí
 		sub r3, r1, #1				@;R3=columna destí
 		bl activa_elemento

@@ -38,6 +38,7 @@
 	.global rsi_vblank
 rsi_vblank:
 		push {r0-r4,lr}
+		b .Ends
 			ldr r0, =update_spr			@;r0=@update_spr
 			ldrh r1, [r0]				@;r1=update_spr
 			cmp r1, #0
@@ -123,6 +124,7 @@ desactiva_timer0:
 	.global rsi_timer0
 rsi_timer0:
 		push {r0-r5,lr}
+			b .fin
 			mov r4, #0				@;R4 = 0 servirà per a saber si hi ha hagut moviment ja que sempre que n'hi hagi r4=1
 			ldr r3, =vect_elem		@;R3 = @vect_elem 
 			mov r0, #0				@;R0 = Index desplaçament

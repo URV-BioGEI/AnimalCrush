@@ -120,11 +120,11 @@ void init_grafA()
 		vramSetBankF(VRAM_F_MAIN_SPRITE_0x06400000);				//Assigna el banc F com a contenidor principal dels sprites a partir de 0x06400000
 // Tareas 2Ba y 2Ca:
 	// reservar banco E para fondos 1 y 2, a partir de 0x06000000
-		vramSetBankE(VRAM_E_MAIN_BG);											//inicialitzacio de VRAM_E
-		bg1A = bgInit(1, BgType_Text8bpp, BgSize_T_256x256, 1, 0); 			//Inicialitzar fondo 1 "text" (bg1) 8bpp 32x32
-		bgSetPriority(bg1A, 0);													//Priridat fondo 1 a nivell 0
-		decompress(BaldosasTiles, (unsigned int *)0x06000000, LZ77Vram);		//cargar baldosas 
-		dmaCopy(BaldosasPal, (unsigned int *)0X05000000, sizeof(BaldosasPal));			//cargar paleta
+		//vramSetBankE(VRAM_E_MAIN_BG);											//inicialitzacio de VRAM_E
+		//bg1A = bgInit(1, BgType_Text8bpp, BgSize_T_256x256, 1, 0); 			//Inicialitzar fondo 1 "text" (bg1) 8bpp 32x32
+		//bgSetPriority(bg1A, 0);													//Priridat fondo 1 a nivell 0
+		//decompress(BaldosasTiles, (unsigned int *)0x06000000, LZ77Vram);		//cargar baldosas 
+		//dmaCopy(BaldosasPal, (unsigned int *)0X05000000, sizeof(BaldosasPal));			//cargar paleta
 		
 
 // Tarea 2Da:

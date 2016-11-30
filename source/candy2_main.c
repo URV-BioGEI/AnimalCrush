@@ -141,7 +141,7 @@ int main(void)
 				}
 				else change = 1;				// sino, revisar estado matriz
 			}
-			//escribe_matriz(matrix);			// visualiza bajadas o eliminaciones
+			escribe_matriz(matrix);			// visualiza bajadas o eliminaciones
 		}
 		else					//////	SECCIÓN DE JUGADAS	//////
 		{
