@@ -16,7 +16,7 @@
 	update_spr:	.hword	0			@;1 -> actualizar sprites
 		.global timer0_on
 	timer0_on:	.hword	0 			@;1 -> timer0 en marcha, 0 -> apagado
-	divFreq0: .hword	-358			@;divisor de frecuencia inicial para timer 0 shouldichange
+	divFreq0: .hword	-10000			@;divisor de frecuencia inicial para timer 0 shouldichange
 
 
 @;-- .bss. variables (globales) no inicializadas ---
@@ -38,15 +38,16 @@
 	.global rsi_vblank
 rsi_vblank:
 		push {r0-r4,lr}
-		b .Ends
+			
 			ldr r0, =update_spr			@;r0=@update_spr
 			ldrh r1, [r0]				@;r1=update_spr
 			cmp r1, #0
 			beq .Ends					@;Si es 0 (no s'han mogut els sprites), surt
 			bl SPR_actualizarSprites	@; sino actualitza els sprites
-			mov r0, #0					@; carrega un 0
-			strh r0, [r0]				@; i guarda'l
+			mov r1, #0					@; carrega un 0
+			strh r1, [r0]				@; i guarda'l
 			@;Aquí acaba la meva funció, tots els registres estan lliures.
+			b .Ends
 @;Tarea 2Ga
 
 

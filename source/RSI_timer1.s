@@ -12,7 +12,7 @@
 		.align 2
 		.global timer1_on
 	timer1_on:	.hword	0 			@;1 -> timer1 en marcha, 0 -> apagado
-	divFreq1: .hword	1			@;divisor de frecuencia para timer 1
+	divFreq1: .hword	-10000			@;divisor de frecuencia para timer 1
 
 
 @;-- .bss. variables (globales) no inicializadas ---
