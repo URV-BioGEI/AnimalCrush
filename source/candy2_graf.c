@@ -120,23 +120,14 @@ void init_grafA()
 		vramSetBankF(VRAM_F_MAIN_SPRITE_0x06400000);				//Assigna el banc F com a contenidor principal dels sprites a partir de 0x06400000
 // Tareas 2Ba y 2Ca:
 	// reservar banco E para fondos 1 y 2, a partir de 0x06000000
-		//vramSetBankE(VRAM_E_MAIN_BG);											//inicialitzacio de VRAM_E
-		//bg1A = bgInit(1, BgType_Text8bpp, BgSize_T_256x256, 1, 0); 			//Inicialitzar fondo 1 "text" (bg1) 8bpp 32x32
-		//bgSetPriority(bg1A, 0);													//Priridat fondo 1 a nivell 0
-		//decompress(BaldosasTiles, (unsigned int *)0x06000000, LZ77Vram);		//cargar baldosas 
-		//dmaCopy(BaldosasPal, (unsigned int *)0X05000000, sizeof(BaldosasPal));			//cargar paleta
+		vramSetBankE(VRAM_E_MAIN_BG);											//inicialitzacio de VRAM_E
 		
 
 // Tarea 2Da:
 	// reservar bancos A y B para fondo 3, a partir de 0x06020000
-	vramSetBankA(VRAM_A_MAIN_BG_0x06020000);							//Inicialitzacio de VRAM_A
-	vramSetBankB(VRAM_B_MAIN_BG_0x06040000);							//Inicialitzacio de VRAM_B
-	bg3A = bgInit(3, BgType_Bmp16, BgSize_B16_512x256, 8, 0);			//Inicialitzar fondo
-	bgSetPriority(bg3A, 3);												//Prioridad fondo
-	decompress(FondoBitmap, bgGetGfxPtr(bg3A), LZ77Vram);				//Cargar pixeles
-	ajusta_imagen3(3);
-
-
+		vramSetBankA(VRAM_A_MAIN_BG_0x06020000);							//Inicialitzacio de VRAM_A
+		vramSetBankB(VRAM_B_MAIN_BG_0x06040000);							//Inicialitzacio de VRAM_B
+	
 
 // Tarea 2Aa:
 	// cargar las baldosas de la variable SpritesTiles[] a partir de la
@@ -146,12 +137,14 @@ void init_grafA()
 		dmaCopy(SpritesPal, (unsigned int *) 0x05000200, sizeof(SpritesPal));	//  Sprite Palette display engine A =0x05000200 = SPRITE_PALETTE
 // Tarea 2Ba:
 	// inicializar el fondo 2 con prioridad 2
-
+		bg2A = bgInit(2, BgType_Text8bpp, BgSize_T_256x256, 0, 0);			//Inicialitzar fondo
+		bgSetPriority(bg2A, 2);
 
 
 // Tarea 2Ca:
 	//inicializar el fondo 1 con prioridad 0
-
+		bg1A = bgInit(1, BgType_Text8bpp, BgSize_T_256x256, 2, 0); 			//Inicialitzar fondo 1 "text" (bg1) 8bpp 32x32
+		bgSetPriority(bg1A, 0);													//Priridat fondo 1 a nivell 0
 
 
 // Tareas 2Ba y 2Ca:
@@ -159,16 +152,19 @@ void init_grafA()
 	// partir de la dirección de memoria correspondiente a los gráficos de
 	// las baldosas para los fondos 1 y 2, cargar los colores de paleta
 	// correspondientes contenidos en la variable BaldosasPal[]
-
+		decompress(BaldosasTiles, bgGetGfxPtr(bg2A), LZ77Vram);			//cargar baldosas
+		dmaCopy(BaldosasPal, BG_PALETTE, sizeof(BaldosasPal));				//cargar palette
 
 	
 // Tarea 2Da:
 	// inicializar el fondo 3 con prioridad 3
-
+		bg3A = bgInit(3, BgType_Bmp16, BgSize_B16_512x256, 8, 0);			//Inicialitzar fondo
+		bgSetPriority(bg3A, 3);												//Prioridad fondo
 
 	// descomprimir (y cargar) la imagen de la variable FondoBitmap[] a partir
 	// de la dirección virtual de vídeo correspondiente al banco de vídeoRAM A
-
+		decompress(FondoBitmap, bgGetGfxPtr(bg3A), LZ77Vram);				//Cargar pixeles
+		ajusta_imagen3(3);
 
 
 	// fijar display A en pantalla inferior (táctil)
