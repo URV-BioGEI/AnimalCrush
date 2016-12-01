@@ -143,7 +143,7 @@ void init_grafA()
 
 // Tarea 2Ca:
 	//inicializar el fondo 1 con prioridad 0
-		bg1A = bgInit(1, BgType_Text8bpp, BgSize_T_256x256, 2, 0); 			//Inicialitzar fondo 1 "text" (bg1) 8bpp 32x32
+		bg1A = bgInit(1, BgType_Text8bpp, BgSize_T_256x256, 0, 0); 			//Inicialitzar fondo 1 "text" (bg1) 8bpp 32x32
 		bgSetPriority(bg1A, 0);													//Priridat fondo 1 a nivell 0
 
 
@@ -152,7 +152,7 @@ void init_grafA()
 	// partir de la dirección de memoria correspondiente a los gráficos de
 	// las baldosas para los fondos 1 y 2, cargar los colores de paleta
 	// correspondientes contenidos en la variable BaldosasPal[]
-		decompress(BaldosasTiles, bgGetGfxPtr(bg2A), LZ77Vram);			//cargar baldosas
+		decompress(BaldosasTiles, (unsigned int *)0X06000000, LZ77Vram);	//cargar baldosas
 		dmaCopy(BaldosasPal, BG_PALETTE, sizeof(BaldosasPal));				//cargar palette
 
 	
