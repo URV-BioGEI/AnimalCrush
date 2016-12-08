@@ -129,38 +129,49 @@ elimina_secuencias:
 		.Lwfinalfila:
 		bl marcar_horizontales
 		bl marcar_verticales
-		mov r2, #0					@; R2: fila
-		mov r3, #0					@; R3: columna
+		mov r2, r0					@; R2: matriz de juego
+		mov r3, r1					@; R3: matriz de marcas
+		mov r0, #0					@; R0: fila
+		mov r1, #0					@; R1: columna
 		.Lwfila2:
-			cmp r2, r4
+			cmp r0, r4
 			bge .Lwfinalfila2
 			.Lwcolumna2:
-				cmp r3, r5
+				cmp r1, r5
 				bge .Lwfinalcolumna2
-				mul r11, r2, r5			@; R11: fila per a coordena
-				add r7, r11, r3			@; R7: coordena de la matriz
-				ldrb r8, [r1, r7]		@; R8: carrega el que hi ha en la coordena R7 de la matriz_marcas
+				mul r11, r0, r5			@; R11: fila per a coordena
+				add r7, r11, r1			@; R7: coordena de la matriz
+				ldrb r8, [r3, r7]		@; R8: carrega el que hi ha en la coordena R7 de la matriz_marcas
 				cmp r8, #0
 				beq .Lfinif
-				ldrb r9, [r0, r7]		@; R9: carrega el que hi ha en la coordena R7 de la matriz de juego
+				ldrb r9, [r2, r7]		@; R9: carrega el que hi ha en la coordena R7 de la matriz de juego
 				cmp r9, #14
 				ble .Lif
+				push {r0}
+				bl elimina_elemento
+				pop {r0}
+				bl elimina_gelatina
 				mov r10, #8				@; R10: guardar gelatina 8 en la matriz
-				strb r10, [r0, r7]
+				strb r10, [r2, r7]
 				b .Lfinif
 				.Lif:
-				cmp r9, #7
-				beq .Lfinif
-				cmp r9, #8
-				beq .Lfinif
-				mov r10, #0
-				strb r10, [r0, r7]		@; R10: guardar 0 en la matriz
+					cmp r9, #8
+					blgt elimina_gelatina	@; Si es mes gran de 8 sera una gelatina simple
+					cmp r9, #7
+					beq .Lfinif
+					cmp r9, #8
+					beq .Lfinif
+					push {r0}
+					bl elimina_elemento		@; guardem r0 perque la funcio retorna un valor
+					pop {r0}
+					mov r10, #0
+					strb r10, [r2, r7]		@; R10: guardar 0 en la matriz
 				.Lfinif:
-				add r3, #1
+				add r1, #1
 				b .Lwcolumna2
 			.Lwfinalcolumna2:
-			add r2, #1
-			mov r3, #0
+			add r0, #1
+			mov r1, #0
 			b .Lwfila2
 		.Lwfinalfila2:
 		pop {r2-r11, pc}

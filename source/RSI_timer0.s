@@ -43,9 +43,13 @@ rsi_vblank:
 			ldrh r1, [r0]				@;r1=update_spr
 			cmp r1, #0
 			beq .Ends					@;Si es 0 (no s'han mogut els sprites), surt
-			bl SPR_actualizarSprites	@; sino actualitza els sprites
 			mov r1, #0					@; carrega un 0
 			strh r1, [r0]				@; i guarda'l
+			mov r0, #0x07000000
+			mov r3, #ROWS
+			mov r2, #COLUMNS
+			mul r1, r2, r3
+			bl SPR_actualizarSprites	@; sino actualitza els sprites
 			@;Aquí acaba la meva funció, tots els registres estan lliures.
 			b .Ends
 @;Tarea 2Ga
