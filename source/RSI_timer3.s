@@ -17,7 +17,7 @@
 		.global offsetBG3X
 	offsetBG3X: .hword	0				@;desplazamiento vertical fondo 3
 	sentidBG3X:	.hword	0				@;sentido desplazamiento (0-> inc / 1-> dec)
-	divFreq3: .hword	-3272,85		@;divisor de frecuencia para timer 3
+	divFreq3: .hword	-32728				@;divisor de frecuencia para timer 3 -32728
 	
 
 
@@ -33,13 +33,12 @@
 activa_timer3:
 		push {r1-r5, lr}
 			ldr r1, =timer3_on			@;ficar timer3_on a 1
-			ldrh r2, [r1]
 			mov r2, #1
 			strh r2, [r1]
 			ldr r3, =divFreq3			@;DIV FREQ
 			ldrh r4, [r3]
 			ldr r5, =0x0400010C			@;guardar freq en timer3_data
-			orr r4, #0x00C30000				@;mascara 1100 0011 per activar el timer i def freq
+			orr r4, #0x00c30000			@;mascara 1100 0011 per activar el timer i def freq
 			str r4, [r5]
 		pop {r1-r5, pc}
 
@@ -51,7 +50,7 @@ desactiva_timer3:
 		push {r0, r1,lr}
 			ldr r0, =timer3_on
 			mov r1, #0
-			str r1, [r0] 				@;Deactivem timer0_on
+			strh r1, [r0] 				@;Deactivem timer0_on
 			ldr r0, =0x0400010E			@;0x0400010E	Timer3_control
 			ldrh r1, [r0]
 			bic r1, #128				@;Posem bit 7 a 0 (desactiva timer) 1000 0000
@@ -72,7 +71,7 @@ rsi_timer3:
 		push {r1-r6, lr}
 			ldr r1, =sentidBG3X
 			ldrh r2, [r1]
-			ldr r3, =offsetBG3X
+			ldr r3, =offsetBG3X			@;offsetBG3x= desplaçament pixels imatges
 			ldrh r4, [r3]
 			cmp r4, #320				@;comparar amb el limit inferior 
 			moveq r2, #1				@;com no podem baixar mes canviem de sentit a 1

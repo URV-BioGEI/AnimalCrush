@@ -51,23 +51,23 @@ rsi_vblank:
 			mul r1, r2, r3
 			bl SPR_actualizarSprites	@; sino actualitza els sprites
 			@;Aquí acaba la meva funció, tots els registres estan lliures.
-			b .Ends
+		
 @;Tarea 2Ga
 
 
 @;Tarea 2Ha
 	
 			ldr r1, =update_bg3
-			ldr r2, [r1]
-			cmp r2, #0
+			ldrh r2, [r1]
+			cmp r2, #0							@;comparacio de update_bg3
 			beq .Ends
-			ldr r3, =offsetBG3X
-			ldr r4, [r3]
-			@;.type U32.F32 r4 {, #8}			@;format coma fixe 0.8.8 ??????
-			ldr r3, =0x04000038					@;REG_BG3X --> 0.20.8	/	REG_BG3PA, REG_BG3PB, REG_BG3PC i REG_BG3PD --> 0.8.8
-			strb r4, [r3]
+			ldr r3, =offsetBG3X					@;guardar desplaçament de offsetBG3X
+			ldrh r4, [r3]
+			mov r4, r4, lsl #8									
+			ldr r3, =0x04000038					@;REG_BG3X 0.8.8	0x04000038 part decimal/ 0400 003C part entera
+			strh r4, [r3]
 			mov r2, #0
-			str r2, [r1]
+			strh r2, [r1]
 			.Ends: 
 		pop {r0-r4, pc}
 
