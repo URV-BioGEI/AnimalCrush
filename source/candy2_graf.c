@@ -21,7 +21,7 @@
 int n_sprites = 0;					// número total de sprites creados
 elemento vect_elem[ROWS*COLUMNS];	// vector de elementos
 gelatina mat_gel[ROWS][COLUMNS];	// matriz de gelatinas
-
+int mod_random(int n);
 
 
 // TAREA 2Ab
@@ -91,7 +91,34 @@ void genera_mapa2(char mat[][COLUMNS])
 	control de la animación de las gelatinas mat_gel[][COLUMNS]. */
 void genera_mapa1(char mat[][COLUMNS])
 {
-
+	int i,j;
+	for (i=0; i<ROWS; i++)
+	{
+		for (j=0; j<COLUMNS; j++)
+		{
+			if (mat[i][j]==15 || (mat[i][j]!=7 && mat[i][j]<7)){ //ni bloque solido ni gelatina	
+				fijar_metabaldosa((u16 *) 0x06001000, i, j, 19);
+			}
+			if (mat[i][j]==7){ //bloque solido	
+				fijar_metabaldosa((u16 *) 0x06001000, i, j, 16);
+			}
+			if ((mat[i][j]>8 && mat[i][j]<15) || (mat[i][j]>16 && mat[i][j]<23)){ //gelatina	
+				int random = 8;
+				random = mod_random(random); //numero aleatorio entre 0-7
+				if ((mat[i][j]>16 && mat[i][j]<23)){ //gelatina doble
+				random = random+8;
+				}
+				fijar_metabaldosa((u16 *) 0x06001000, i, j, random);
+				int campo = 10; 
+				campo = mod_random(campo)+1; //numero aleatorio entre 1-10
+				mat_gel[i][j].ii=campo;
+				mat_gel[i][j].im=random;
+			}
+			if (mat[i][j]<7){ //no gelatina
+				mat_gel[i][j].ii=-1;
+			}
+		}
+	}
 
 }
 
