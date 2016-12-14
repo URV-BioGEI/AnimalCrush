@@ -129,38 +129,37 @@ desactiva_timer0:
 	.global rsi_timer0
 rsi_timer0:
 		push {r0-r5,lr}
-			b .fin
 			mov r4, #0				@;R4 = 0 servirà per a saber si hi ha hagut moviment ja que sempre que n'hi hagi r4=1
 			ldr r3, =vect_elem		@;R3 = @vect_elem 
 			mov r0, #0				@;R0 = Index desplaçament
 			.b:
 			ldrh r2, [r3]			@;R2 = ii
 			cmp r2, #0				@;si es 0 o -1
-			addle r3, #10			@;suma 10 per a desplaçar el vector
+			addle r3, #10			@;suma 10 al desplaçament per a desplaçar el vector
 			ble .Endb				@;I ves al final
 			mov r4, #1				@;Es mourà un element!
 			sub r2, #1				@;Si en canvi l'element està actiu resta 1 a ii
 			strh r2, [r3]			@;i guarda'l
-			add r3, #2				@;Augmenta l'index en dos (avança al seguent hword)
-			ldrh r1, [r0]			@;R1 = px
-			ldrh r5, [r0, #4]		@;R5 = vx
+			add r3, #2				@;Augmenta apuntador en dos (avança al seguent hword)
+			ldrh r1, [r3]			@;R1 = px
+			ldrh r5, [r3, #4]		@;R5 = vx
 			cmp r5, #0				@;si vx...
 			addgt r1, #1			@;Major que 0, suma 1 als pixels
 			sublt r1, #1			@;Menor que 0, resta 1 als pixels
-			strh r1, [r0]			@;Guarda contingut R2 = px a on li toca
-			add r3, #2				@;Augmenta l'index en dos (avança al seguent hword)
-			ldrh r2, [r0]			@;R2 = py
-			ldrh r5, [r0, #4]		@;R5 = vy
+			strh r1, [r3]			@;Guarda contingut R1 = px a on li toca
+			add r3, #2				@;Augmenta el pointer en dos (avança al seguent hword)
+			ldrh r2, [r3]			@;R2 = py
+			ldrh r5, [r3, #4]		@;R5 = vy
 			cmp r5, #0				@;si vy...
 			addgt r2, #1			@;Major que 0, suma 1 als pixels
-			strh r2, [r0]			@;Guarda contingut r2 (px o py) a on li toca. 
+			strh r2, [r3]			@;Guarda contingut r2 (px o py) a on li toca. 
 			@;shouldichange guardaria amb instruccio predicada per estalviarme un acces a memoria pero strhgt bad instruction :(
 			bl SPR_moverSprite		@;Actualitza el moviment de l'sprite
 			@; void SPR_moverSprite(int indice, int px, int py)
 			add r3, #4				@;Acaba d'avançar fins al següent element
 			.Endb:
-			add r1, #1				@;Suma 1 a l'índex
-			cmp r1, #127			@;Si l'index no es 127
+			add r0, #1				@;Suma 1 a l'índex
+			cmp r0, #127			@;Si l'index no es 127
 			bne .b					@;Torna a iterar
 			cmp r4, #1				@;Si flag de moviment es 0
 			blne desactiva_timer0	@;Desactiva timer 0 per a quan no hi ha moviment
@@ -170,9 +169,9 @@ rsi_timer0:
 			strh r1, [r0]			@;Activa-la guardant un 1
 			ldr r1, =0x04000100 	@;R1 = @timer0 data
 			ldrh r0, [r1]			@;R0 = timer0_data
-			cmp r0, #-128			@;Si r0 (div freq) major que -128
+			cmp r0, #-128			@;Si r0 (div freq) menor que -128
 			bge .fin				@;Surt
-			add r0, #10				@;i sino Suma 10 (valor a modificar al fer proves), això disminuirà el valor del div_fre, ja que es negatiu
+			add r0, #1				@;i sino Suma 1 (valor a modificar al fer proves), això disminuirà el valor del div_fre, ja que es negatiu
 			strh r0, [r1]			@;Guarda'l
 			.fin:
 		pop {r0-r5, pc}
