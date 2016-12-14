@@ -16,7 +16,7 @@
 	update_spr:	.hword	0			@;1 -> actualizar sprites
 		.global timer0_on
 	timer0_on:	.hword	0 			@;1 -> timer0 en marcha, 0 -> apagado
-	divFreq0: .hword	-10000			@;divisor de frecuencia inicial para timer 0 shouldichange
+	divFreq0: .hword	-300			@;divisor de frecuencia inicial para timer 0 shouldichange
 
 
 @;-- .bss. variables (globales) no inicializadas ---
@@ -128,39 +128,51 @@ desactiva_timer0:
 @;	ii, px, py, vx, vy
 	.global rsi_timer0
 rsi_timer0:
-		push {r0-r5,lr}
-			b .fin
+		push {r0-r6,lr}
+			mov r0, #ROWS
+			mov r1, #COLUMNS
+			mul r6, r1, r0			@;Calculem max desplaçament per vect elem
 			mov r4, #0				@;R4 = 0 servirà per a saber si hi ha hagut moviment ja que sempre que n'hi hagi r4=1
 			ldr r3, =vect_elem		@;R3 = @vect_elem 
 			mov r0, #0				@;R0 = Index desplaçament
 			.b:
 			ldrh r2, [r3]			@;R2 = ii
 			cmp r2, #0				@;si es 0 o -1
-			addle r3, #10			@;suma 10 per a desplaçar el vector
-			ble .Endb				@;I ves al final
+			addeq r3, #10			@;suma 10 per a desplaçar el vector
+			beq .Endb				@;I ves al final
+			tst r2, #0x8000
+			addne r3, #10
+			bne .Endb
 			mov r4, #1				@;Es mourà un element!
 			sub r2, #1				@;Si en canvi l'element està actiu resta 1 a ii
 			strh r2, [r3]			@;i guarda'l
 			add r3, #2				@;Augmenta l'index en dos (avança al seguent hword)
-			ldrh r1, [r0]			@;R1 = px
-			ldrh r5, [r0, #4]		@;R5 = vx
+			ldrh r1, [r3]			@;R1 = px
+			ldrh r5, [r3, #4]		@;R5 = vx
 			cmp r5, #0				@;si vx...
-			addgt r1, #1			@;Major que 0, suma 1 als pixels
-			sublt r1, #1			@;Menor que 0, resta 1 als pixels
-			strh r1, [r0]			@;Guarda contingut R2 = px a on li toca
+			beq .x
+			tst r5, #0x8000
+			addeq r1, #1			@;Major que 0, suma 1 als pixels
+			subne r1, #1			@;Menor que 0, resta 1 als pixels
+			strh r1, [r3]			@;Guarda contingut R2 = px a on li toca
+			.x:
 			add r3, #2				@;Augmenta l'index en dos (avança al seguent hword)
-			ldrh r2, [r0]			@;R2 = py
-			ldrh r5, [r0, #4]		@;R5 = vy
-			cmp r5, #0				@;si vy...
-			addgt r2, #1			@;Major que 0, suma 1 als pixels
-			strh r2, [r0]			@;Guarda contingut r2 (px o py) a on li toca. 
+			ldrh r2, [r3]			@;R2 = py
+			ldrh r5, [r3, #4]		@;R5 = vy
+			cmp r5, #0				@;si vx...
+			beq .y
+			tst r5, #0x8000
+			addeq r2, #1			@;Major que 0, suma 1 als pixels
+			subne r2, #1			@;Menor que 0, resta 1 als pixels
+			strh r1, [r3]			@;Guarda contingut R2 = px a on li toca
+			.y:
 			@;shouldichange guardaria amb instruccio predicada per estalviarme un acces a memoria pero strhgt bad instruction :(
 			bl SPR_moverSprite		@;Actualitza el moviment de l'sprite
 			@; void SPR_moverSprite(int indice, int px, int py)
-			add r3, #4				@;Acaba d'avançar fins al següent element
+			add r3, #6				@;Acaba d'avançar fins al següent element
 			.Endb:
-			add r1, #1				@;Suma 1 a l'índex
-			cmp r1, #127			@;Si l'index no es 127
+			add r0, #1				@;Suma 1 a l'índex
+			cmp r0, r6				@;Si l'index no es ROWS*COLUMNS
 			bne .b					@;Torna a iterar
 			cmp r4, #1				@;Si flag de moviment es 0
 			blne desactiva_timer0	@;Desactiva timer 0 per a quan no hi ha moviment
@@ -175,7 +187,7 @@ rsi_timer0:
 			add r0, #10				@;i sino Suma 10 (valor a modificar al fer proves), això disminuirà el valor del div_fre, ja que es negatiu
 			strh r0, [r1]			@;Guarda'l
 			.fin:
-		pop {r0-r5, pc}
+		pop {r0-r6, pc}
 
 
 

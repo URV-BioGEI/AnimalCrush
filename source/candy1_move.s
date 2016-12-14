@@ -340,6 +340,7 @@ baja_laterales:
 		bne .Dreta					@;Anem a la dreta arbitrariament
 		@;SECCIO ESQUERRA
 		.Esquerra:
+		
 		push {r0-r3}				@;Funcio I
 		mov r0, r1
 		mov r1, r2
@@ -347,6 +348,7 @@ baja_laterales:
 		sub r3, r1, #1
 		bl activa_elemento
 		pop {r0-r3}
+		
 		sub r5, r3, #COLUMNS		@;Restar columnes
 		sub r5, #1					@;restem 1 per a ajustar
 		ldrb r8, [r5]				@;Carregar a r8 el contingut de la posicio que sha de moure
@@ -359,6 +361,7 @@ baja_laterales:
 		b .passaseguent				@;Sortim
 		@;SECCIO DRETA
 		.Dreta:
+		
 		push {r0-r3}				@;Funcio I
 		mov r0, r1
 		mov r1, r2
@@ -366,6 +369,7 @@ baja_laterales:
 		add r3, r1, #1
 		bl activa_elemento
 		pop {r0-r3}
+		
 		sub r5, r3, #COLUMNS		@;Restar columnes
 		add r5, r5, #1				@;sumem 1 per a ajustar
 		ldrb r8, [r5]				@;Carregar a r8 el contingut de la posicio que sha de moure
