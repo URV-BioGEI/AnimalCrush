@@ -17,7 +17,7 @@
 		.global offsetBG3X
 	offsetBG3X: .hword	0				@;desplazamiento vertical fondo 3
 	sentidBG3X:	.hword	0				@;sentido desplazamiento (0-> inc / 1-> dec)
-	divFreq3: .hword	-32728				@;divisor de frecuencia para timer 3 -32728
+	divFreq3: .hword	-13091,5				@;divisor de frecuencia para timer 3 -13091,5 per a una freq de entrada de 130915 Hz
 	
 
 
@@ -38,7 +38,7 @@ activa_timer3:
 			ldr r3, =divFreq3			@;DIV FREQ
 			ldrh r4, [r3]
 			ldr r5, =0x0400010C			@;guardar freq en timer3_data
-			orr r4, #0x00c30000			@;mascara 1100 0011 per activar el timer i def freq
+			orr r4, #0x00c20000			@;mascara 1100 0010 per activar el timer i def freq
 			str r4, [r5]
 		pop {r1-r5, pc}
 
