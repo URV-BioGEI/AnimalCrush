@@ -174,7 +174,7 @@ elimina_elemento:
 @;		R3 :	columna destino
 @;	Resultado:
 @;		R0 :	índice del elemento encontrado, o ROWS*COLUMNS
-	.global activa_elemento
+	.global activa_elemento 
 activa_elemento:
 		push {r1-r7,lr}
 		
