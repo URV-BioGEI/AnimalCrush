@@ -53,7 +53,34 @@ rsi_vblank:
 			@;Aquí acaba la meva funció, tots els registres estan lliures.
 		
 @;Tarea 2Ga
-
+			ldr r1, =update_gel			@;r1=@update_gel
+			ldrh r0, [r1]				@;r0=update_gel
+			cmp r0, #0	
+			beq .seg					@;si esta desactivada ignora els següents passos
+			ldr r2, =mat_gel			@;r2=mat_gel[][COLUMNS]
+			mov r3, #0					@;r3=index
+			mov r4, #ROWS
+			mov r5, #COLUMNS	
+			mul r6, r4, r5				@;r6=ROWS*COLUMNS
+		.L_recorreMatGel:
+			ldrh r4, [r2]				@;r4=camp ii
+			cmp r4, #-1
+			beq .L_finalMat_gel			@;si es -1 o superior a 0, ignorem la posicio
+			cmp r4, #0
+			bhi .L_finalMat_gel
+			mov r5, #10					@;sino:
+			str r5, [r2]				@;guardem 10 al camp ii
+			ldrh r0, [r2, #2]			@;r0=camp im
+			bl fijar_metabaldosa
+		.L_finalMat_gel:
+			add r3, #1
+			add r2, #4					@;seguent casella (words)
+			cmp r3, r6					@;comparem amb el final de la matriu
+			bls .L_recorreMat_gel		@;si es mes petit o igual al final, passem a la seguent casella
+			mov r0, #0
+			str r0, [r1]				@;desactivem update_gel
+		
+		.seg:
 
 @;Tarea 2Ha
 	
