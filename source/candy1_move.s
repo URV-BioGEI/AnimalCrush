@@ -292,9 +292,9 @@ baja_verticales:
 @;		r10= resultat de la funcio
 baja_laterales:
 		push {r0-r10, lr}
-		mov r1, #ROWS					@;Carreguem index fila
-		mov r2, #COLUMNS				@;Carreguem index columna	
-		mov r10, #0						@;No haurem fet cap moviment fins que no es faci el contrari
+		mov r1, #ROWS				@;Carreguem index fila
+		mov r2, #COLUMNS			@;Carreguem index columna	
+		mov r10, #0					@;No haurem fet cap moviment fins que no es faci el contrari
 		mla r3, r1, r2, r4			@;Apuntem a la primera posicio valida de la matriu
 		sub r3, #1					@;restem 1 per a corregir
 		.buclewhile:
@@ -340,8 +340,15 @@ baja_laterales:
 		bne .Dreta					@;Anem a la dreta arbitrariament
 		@;SECCIO ESQUERRA
 		.Esquerra:
+		push {r0-r3}				@;Funcio I
+		mov r0, r1
+		mov r1, r2
+		add r2, r0, #1
+		sub r3, r1, #1
+		bl activa_elemento
+		pop {r0-r3}
 		sub r5, r3, #COLUMNS		@;Restar columnes
-		sub r5, r5, #1				@;restem 1 per a ajustar
+		sub r5, #1					@;restem 1 per a ajustar
 		ldrb r8, [r5]				@;Carregar a r8 el contingut de la posicio que sha de moure
 		and r9, r8, #24				@;Bit clear
 		strb r9, [r5]				@;Guarda els bits de mes pes on estaven
@@ -352,6 +359,13 @@ baja_laterales:
 		b .passaseguent				@;Sortim
 		@;SECCIO DRETA
 		.Dreta:
+		push {r0-r3}				@;Funcio I
+		mov r0, r1
+		mov r1, r2
+		add r2, r0, #1
+		add r3, r1, #1
+		bl activa_elemento
+		pop {r0-r3}
 		sub r5, r3, #COLUMNS		@;Restar columnes
 		add r5, r5, #1				@;sumem 1 per a ajustar
 		ldrb r8, [r5]				@;Carregar a r8 el contingut de la posicio que sha de moure
