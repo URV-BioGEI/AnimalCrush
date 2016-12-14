@@ -37,7 +37,7 @@
 @;Tarea 2H: actualiza el desplazamiento del fondo 3
 	.global rsi_vblank
 rsi_vblank:
-		push {r0-r4,lr}
+		push {r0-r6,lr}
 			
 			ldr r0, =update_spr			@;r0=@update_spr
 			ldrh r1, [r0]				@;r1=update_spr
@@ -69,14 +69,14 @@ rsi_vblank:
 			cmp r4, #0
 			bhi .L_finalMat_gel
 			mov r5, #10					@;sino:
-			str r5, [r2]				@;guardem 10 al camp ii
+			strh r5, [r2]				@;guardem 10 al camp ii
 			ldrh r0, [r2, #2]			@;r0=camp im
 			bl fijar_metabaldosa
 		.L_finalMat_gel:
 			add r3, #1
 			add r2, #4					@;seguent casella (words)
 			cmp r3, r6					@;comparem amb el final de la matriu
-			bls .L_recorreMat_gel		@;si es mes petit o igual al final, passem a la seguent casella
+			bls .L_recorreMatGel		@;si es mes petit o igual al final, passem a la seguent casella
 			mov r0, #0
 			str r0, [r1]				@;desactivem update_gel
 		
@@ -96,7 +96,7 @@ rsi_vblank:
 			mov r2, #0
 			strh r2, [r1]
 			.Ends: 
-		pop {r0-r4, pc}
+		pop {r0-r6, pc}
 
 
 
