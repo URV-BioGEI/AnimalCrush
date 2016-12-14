@@ -35,12 +35,8 @@ activa_timer2:
 		ldr r0, =0x04000108 	@;r0=@registre de dades del timer2
 		ldr r1, =divFreq2		@;r1=@divisor de freq
 		ldrh r2, [r1]
-		strh r2, [r0]			@;carreguem el valor del divisor de freq al timer2
-		ldr r0, =0x0400010A		@;r0=@registre de control del timer2
-		
-		
-		mov r1, #255
-		strb r1, [r0]			@;activem tots els bits de control del timer2 a 1
+		orr r2, #0x00C30000		@;activar timer2
+		str r2, [r0]
 		pop {r0-r2, pc}
 
 
@@ -53,8 +49,9 @@ desactiva_timer2:
 		mov r1, #0
 		strh r1, [r0]			@;posem timer2_on = 0
 		ldr r0, =0x0400010A		@;r0=@registre de control del timer2
-		mov r1, #0
-		strb r1, [r0]			@;desactivem el timer2
+		ldrh r1, [r0]
+		bic r1, #128			@;bit 7 a 0 (start/stop)
+		strh r1, [r0]			@;desactivem el timer2
 		pop {r0-r1, pc}
 
 
