@@ -70,10 +70,10 @@ void genera_mapa2(char mat[][COLUMNS])
 	{
 		for (j=0; j<COLUMNS; j++)
 		{
-			if (mat[i][j]==15)	fijar_metabaldosa((u16 *) 0x06000000, i, j, 19);
+			if (mat[i][j]==15)	fijar_metabaldosa((u16 *) 0x06000800, i, j, 19);
 			else{
-				if ((i+j)%2==0) fijar_metabaldosa((u16 *) 0x06000000, i, j, 17);
-				else fijar_metabaldosa((u16 *) 0x06000000, i, j, 18);
+				if ((i+j)%2==0) fijar_metabaldosa((u16 *) 0x06000800, i, j, 17);
+				else fijar_metabaldosa((u16 *) 0x06000800, i, j, 18);
 			}
 		}
 	}
@@ -97,10 +97,10 @@ void genera_mapa1(char mat[][COLUMNS])
 		for (j=0; j<COLUMNS; j++)
 		{
 			if (mat[i][j]==15 || (mat[i][j]!=7 && mat[i][j]<7)){ //ni bloque solido ni gelatina	
-				fijar_metabaldosa((u16 *) 0x06001000, i, j, 19);
+				fijar_metabaldosa((u16 *) 0x06000000, i, j, 19);
 			}
 			if (mat[i][j]==7){ //bloque solido	
-				fijar_metabaldosa((u16 *) 0x06001000, i, j, 16);
+				fijar_metabaldosa((u16 *) 0x06000000, i, j, 16);
 			}
 			if ((mat[i][j]>8 && mat[i][j]<15) || (mat[i][j]>16 && mat[i][j]<23)){ //gelatina	
 				int random = 8;
@@ -108,7 +108,7 @@ void genera_mapa1(char mat[][COLUMNS])
 				if ((mat[i][j]>16 && mat[i][j]<23)){ //gelatina doble
 				random = random+8;
 				}
-				fijar_metabaldosa((u16 *) 0x06001000, i, j, random);
+				fijar_metabaldosa((u16 *) 0x06000000, i, j, random);
 				int campo = 10; 
 				campo = mod_random(campo)+1; //numero aleatorio entre 1-10
 				mat_gel[i][j].ii=campo;
@@ -174,13 +174,13 @@ void init_grafA()
 		dmaCopy(SpritesPal, (unsigned int *) 0x05000200, sizeof(SpritesPal));	//  Sprite Palette display engine A =0x05000200 = SPRITE_PALETTE
 // Tarea 2Ba:
 	// inicializar el fondo 2 con prioridad 2
-		bg2A = bgInit(2, BgType_Text8bpp, BgSize_T_256x256, 0, 0);			//Inicialitzar fondo
+		bg2A = bgInit(2, BgType_Text8bpp, BgSize_T_256x256, 1, 1);			//Inicialitzar fondo
 		bgSetPriority(bg2A, 2);
 
 
 // Tarea 2Ca:
 	//inicializar el fondo 1 con prioridad 0
-		bg1A = bgInit(1, BgType_Text8bpp, BgSize_T_256x256, 2, 0); 			//Inicialitzar fondo 1 "text" (bg1) 8bpp 32x32
+		bg1A = bgInit(1, BgType_Text8bpp, BgSize_T_256x256, 0, 1); 			//Inicialitzar fondo 1 "text" (bg1) 8bpp 32x32
 		bgSetPriority(bg1A, 0);													//Priridat fondo 1 a nivell 0
 
 
@@ -189,7 +189,8 @@ void init_grafA()
 	// partir de la dirección de memoria correspondiente a los gráficos de
 	// las baldosas para los fondos 1 y 2, cargar los colores de paleta
 	// correspondientes contenidos en la variable BaldosasPal[]
-		decompress(BaldosasTiles, bgGetGfxPtr(bg2A), LZ77Vram);			//cargar baldosas
+		decompress(BaldosasTiles, bgGetGfxPtr(bg2A), LZ77Vram);			//cargar baldosas fondo2
+		decompress(BaldosasTiles, bgGetGfxPtr(bg1A), LZ77Vram);			//cargar baldosas fondo1
 		dmaCopy(BaldosasPal, BG_PALETTE, sizeof(BaldosasPal));				//cargar palette
 
 	
