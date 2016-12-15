@@ -32,23 +32,20 @@ hay_combinacion:
 				mov r5, r0							@;!*Moviment horitzontal*! guardar direcio base a r5
 				mov r3, #ROWS						@;dim de files
 				mov r12, #COLUMNS					@;dim de columnes
-				mov r0, #6							@;variable que controla si s'ha trobat una combinacio
+				mov r0, #0							@;variable que controla si s'ha trobat una combinacio
 				mov r1, #0							@;r1=files 
 				mov r2, #0							@;r2=columnes
 			.Lwhilef1:
 				cmp r1, #ROWS						@;comprovar condicio f<rows 
 				bge .Lfinwhilef1					@;saltar a final del while de files
-				cmp r0, #6							@;comprovar que no s'hagi trobat ja una combinacio
-				bne .Lfi
 				.Lwhilec1:
 					mov r12, #COLUMNS
 					sub r12, #1						@;r12=dim de columnes-1
 					cmp r2, r12
 					bge .Lfinwhilec1
-					cmp r0, #6
-					bne .Lfi
+					add r12, #1
 					mul r4, r1 ,r12
-					add r4, r2						@;r4=desplaçament(rows*f+c)
+					add r4, r2						@;r4=desplaçament(columns*f+c)
 					ldrb r6, [r5, r4]				@;r6= tipus de gelatina actual
 					cmp r6, #0						@;comparacio amb llocs especials a gelatina actual
 					beq .Lif1
@@ -97,21 +94,16 @@ hay_combinacion:
 				mov r2, #0							@;r2=columnes, r1=files 
 				mov r3, #ROWS						@;dim de files
 				mov r12, #COLUMNS					@;dim de columnes
-				add r12, #1
 			.Lwhilef2:
 				mov r11, #ROWS
 				sub r11, #1							@;r11=dim de files-1
 				cmp r1, r11							@;comprovar condicio f<rows 
 				bge .Lfi							@;saltar a final del while de files
-				cmp r0, #6							@;comprovar que no s'hagi trobat ja una combinacio
-				bne .Lfi
 				.Lwhilec2:
 					cmp r2, #COLUMNS
 					bge .Lfinwhilec2
-					cmp r0, #6
-					bne .Lfi
 					mul r4, r1 ,r12
-					add r4, r2						@;r4=desplaçament(rows*f+c)
+					add r4, r2						@;r4=desplaçament(columns*f+c)
 					ldrb r6, [r5, r4]				@;r6= tipus de gelatina actual
 					cmp r6, #0						@;comparacio amb llocs especials
 					beq .Lif2
@@ -170,12 +162,8 @@ hay_combinacion:
 				strb r8, [r5, r4]
 		.Lfi:										@;final 
 		cmp r0, #6
-		beq .Lcanv									
-		mov r0, #1									@;si comb=trobada tornar 1
-		b .Lfinal
-		.Lcanv:
-		mov r0, #0									@;si comb=no trobada tornar 0
-		.Lfinal:	
+		movne r0, #1								@;si comb=trobada tornar 1
+		moveq r0, #0								@;si comb=trobada tornar 0
 		pop {r1-r12,pc}
 
 

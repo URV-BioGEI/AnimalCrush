@@ -1,5 +1,5 @@
 @;=== candy2_incl.i: definiciones comunes para ficheros en ensamblador  ===
-@;===				(versión 2)											===
+@;===				(versión 2)	 										===
 
 .include "../include/candy1_incl.i"
 
