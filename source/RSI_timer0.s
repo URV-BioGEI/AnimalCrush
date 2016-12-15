@@ -17,11 +17,19 @@
 		.global timer0_on
 	timer0_on:	.hword	0 			@;1 -> timer0 en marcha, 0 -> apagado
 <<<<<<< HEAD
+<<<<<<< HEAD
 	divFreq0: .hword	-13091,5			@;divisor de frecuencia inicial para timer 0 shouldichange
 
 =======
 	divFreq0: .hword	-100
 >>>>>>> 14c9800c607a4c952fef8f5100a44c9bc0f15b34
+=======
+	divFreq0: .hword	-100
+=======
+	divFreq0: .hword	-13091,5			@;divisor de frecuencia inicial para timer 0 shouldichange
+
+>>>>>>> prog2
+>>>>>>> 14ca5dc
 
 @;-- .bss. variables (globales) no inicializadas ---
 .bss
