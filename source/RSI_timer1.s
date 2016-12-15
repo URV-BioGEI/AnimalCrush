@@ -12,7 +12,7 @@
 		.align 2
 		.global timer1_on
 	timer1_on:	.hword	0 			@;1 -> timer1 en marcha, 0 -> apagado
-	divFreq1: .hword	-10000		@;divisor de frecuencia para timer 1 (tarda uns 0,3s) podria ficar fins a 11455 per a 0,35s pero aixi va més ràpid
+	divFreq1: .hword	-1431		@;divisor de frecuencia para timer 1 per a 0,35s amb freq. entrada 130914,9921875 Hz
 
 
 @;-- .bss. variables (globales) no inicializadas ---
@@ -44,7 +44,7 @@ activa_timer1:
 			ldr r2, =divFreq1
 			ldrh r3, [r2]
 			ldr r2, =0x04000104			@;Timer1_data
-			orr r3, #0x00C30000			@;Mascara 1100 0011 per activar el timer i def freq, amb 32728.5 Hz d'entrada
+			orr r3, #0x00C20000			@;Mascara 1100 0010 per activar el timer i def freq, amb 130915 Hz d'entrada
 			str r3, [r2]
 			mov r1, #0
 			ldr r2, =escNum
@@ -94,15 +94,18 @@ rsi_timer1:
 			add r1, #1
 			strh r1, [r0]				@;Incrementem escNum
 			cmp r1, #32
-			bleq desactiva_timer1		@;Si escNum = 32 -> desactivar_timer1
+			bne .Lno32
+				bl desactiva_timer1		@;Si escNum = 32 -> desactivar_timer1
+				b .Lfin
+			.Lno32:
 			ldr r0, =escSen
 			ldrh r1, [r0]
 			ldr r0, =escFac
 			ldrh r2, [r0]
 			cmp r1, #0					@;Si escSen = 0 decrementar escFac, si es 1 incrementar escFac
-			addne r2, #40
+			subne r2, #32
 			cmp r1, #0
-			subeq r2, #40
+			addeq r2, #32
 			strh r2, [r0]				@;Actualisem escFac
 			mov r1, r2
 			mov r0, #0
@@ -110,6 +113,7 @@ rsi_timer1:
 			ldr r0, =update_spr
 			mov r1, #1
 			strh r1, [r0]				@;Activem la variable update_spr
+		.Lfin:
 		pop {r0-r2, pc}
 
 
