@@ -31,6 +31,7 @@
 @;activa_timer3(); rutina para activar el timer 3.
 	.global activa_timer3
 activa_timer3:
+<<<<<<< HEAD
 
 		push {r1-r5, lr}
 			ldr r1, =timer3_on			@;ficar timer3_on a 1
@@ -43,12 +44,29 @@ activa_timer3:
 			str r4, [r5]
 		pop {r1-r5, pc}
 
+=======
+		push {r1-r4, lr}
+		ldr r1, =timer3_on			@;poner timer3_on a 1
+		ldrh r2, [r1]
+		mov r2, #1
+		strh r2, [r1]
+		ldr r1, =divFreq3
+		ldrh r2, [r1]
+		ldr r2, #-3272		@;tindria de ser negatiu pero no me deja (-3272)
+		str r2, [r1]
+		ldr r3, =TIMER3_CR
+		ldr r4, [r3]
+		orr r4, #0x23		@;mascara 0010 0011
+		str r4, [r3]
+		pop {r1-r4, pc}
+>>>>>>> remotes/origin/prog4
 
 
 @;TAREA 2Hc;
 @;desactiva_timer3(); rutina para desactivar el timer 3.
 	.global desactiva_timer3
 desactiva_timer3:
+<<<<<<< HEAD
 		push {r0, r1,lr}
 			ldr r0, =timer3_on
 			mov r1, #0
@@ -58,6 +76,19 @@ desactiva_timer3:
 			bic r1, #128				@;Posem bit 7 a 0 (desactiva timer) 1000 0000
 			strh r1, [r0]				@;Guardem al registre de control
 		pop {r0, r1,pc}
+=======
+		push {r1-r4, lr}
+		ldr r1, =TIMER3_CR
+		ldr r2, [r1]
+		and r2, #0x03		@;mascara 0000 0011
+		str r2, [r1]
+		ldr r3, =timer3_on
+		ldrh r4, [r3]
+		mov r4, #0
+		strh r4, [r3]		@;ficar timer3_on a 0
+		pop {r1-r4, pc}
+
+>>>>>>> remotes/origin/prog4
 
 
 @;TAREA 2Hd;
@@ -70,6 +101,7 @@ desactiva_timer3:
 	.global rsi_timer3
 rsi_timer3:
 		push {r1-r6, lr}
+<<<<<<< HEAD
 
 			ldr r1, =sentidBG3X
 			ldrh r2, [r1]
@@ -93,6 +125,28 @@ rsi_timer3:
 			mov r6, #1
 			strh r6, [r5]
 
+=======
+		ldr r1, =sentidBG3
+		ldrh r2, [r1]
+		ldr r3, =offsetBG3x
+		ldrh r4, [r3]
+		cmp r4, #320			@;comparar amb el limit inferior 
+		moveq r2, #1			@;com no podem baixar mes canviem de sentit a 1
+		cmp r4, #0				@;comparar amb el limit superior
+		moveq r2, #0			@;com no podem pujar mes canviem el sentita a 0
+		cmp r2, #0
+		bne .Lno_incrementar
+		add r4, #1				@;si sentit es 0 incrementar
+		strh r4, [r3]
+		b .Lfigir
+		.Lno_incrementar:
+		sub r4, #1				@;si sentit es 1 decrementar
+		strh r4, [r3]
+		.Lfigir:
+		ldr r5, =update_bg3
+		mov r6, #1
+		strh r6, [r5]
+>>>>>>> remotes/origin/prog4
 		pop {r1-r6, pc}
 
 
