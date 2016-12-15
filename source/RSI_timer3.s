@@ -17,7 +17,7 @@
 		.global offsetBG3X
 	offsetBG3X: .hword	0				@;desplazamiento vertical fondo 3
 	sentidBG3X:	.hword	0				@;sentido desplazamiento (0-> inc / 1-> dec)
-	divFreq3: .hword	-32728				@;divisor de frecuencia para timer 3 -32728
+	divFreq3: .hword	-13091,5				@;divisor de frecuencia para timer 3 -13091,5 per a una freq de entrada de 130915 Hz
 	
 
 
@@ -31,6 +31,7 @@
 @;activa_timer3(); rutina para activar el timer 3.
 	.global activa_timer3
 activa_timer3:
+
 		push {r1-r5, lr}
 			ldr r1, =timer3_on			@;ficar timer3_on a 1
 			mov r2, #1
@@ -38,9 +39,10 @@ activa_timer3:
 			ldr r3, =divFreq3			@;DIV FREQ
 			ldrh r4, [r3]
 			ldr r5, =0x0400010C			@;guardar freq en timer3_data
-			orr r4, #0x00c30000			@;mascara 1100 0011 per activar el timer i def freq
+			orr r4, #0x00c20000			@;mascara 1100 0010 per activar el timer i def freq
 			str r4, [r5]
 		pop {r1-r5, pc}
+
 
 
 @;TAREA 2Hc;
@@ -58,7 +60,6 @@ desactiva_timer3:
 		pop {r0, r1,pc}
 
 
-
 @;TAREA 2Hd;
 @;rsi_timer3(); rutina de Servicio de Interrupciones del timer 3: incrementa o
 @;	decrementa el desplazamiento X del fondo 3 (sobre la variable global
@@ -69,14 +70,16 @@ desactiva_timer3:
 	.global rsi_timer3
 rsi_timer3:
 		push {r1-r6, lr}
+
 			ldr r1, =sentidBG3X
 			ldrh r2, [r1]
 			ldr r3, =offsetBG3X			@;offsetBG3x= desplaçament pixels imatges
 			ldrh r4, [r3]
-			cmp r4, #320				@;comparar amb el limit inferior 
+			cmp r4, #255				@;comparar amb el limit inferior 
 			moveq r2, #1				@;com no podem baixar mes canviem de sentit a 1
 			cmp r4, #0					@;comparar amb el limit superior
 			moveq r2, #0				@;com no podem pujar mes canviem el sentita a 0
+			strh r2, [r1]
 			cmp r2, #0	
 			bne .Lno_incrementar
 			add r4, #1					@;si sentit es 0 incrementar
@@ -89,6 +92,7 @@ rsi_timer3:
 			ldr r5, =update_bg3
 			mov r6, #1
 			strh r6, [r5]
+
 		pop {r1-r6, pc}
 
 

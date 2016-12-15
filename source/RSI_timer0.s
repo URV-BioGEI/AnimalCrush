@@ -41,14 +41,16 @@ rsi_vblank:
 			ldr r0, =update_spr			@;r0=@update_spr
 			ldrh r1, [r0]				@;r1=update_spr
 			cmp r1, #0
-			beq .Ends					@;Si es 0 (no s'han mogut els sprites), surt
-			mov r1, #0					@; carrega un 0
-			strh r1, [r0]				@; i guarda'l
+			beq .E					@;Si es 0 (no s'han mogut els sprites), surt
+			mov r1, #0					@; R1=0
+			strh r1, [r0]				@; update_spr=0
 			mov r0, #0x07000000
 			mov r3, #ROWS
 			mov r2, #COLUMNS
 			mul r1, r2, r3
+			
 			bl SPR_actualizarSprites	@; sino actualitza els sprites
+			.E:
 			@;Aquí acaba la meva funció, tots els registres estan lliures.
 		
 @;Tarea 2Ga
@@ -165,7 +167,6 @@ rsi_timer0:
 			subne r2, #1			@;Menor que 0, resta 1 als pixels
 			strh r1, [r3]			@;Guarda contingut R2 = px a on li toca
 			.y:
-			@;shouldichange guardaria amb instruccio predicada per estalviarme un acces a memoria pero strhgt bad instruction :(
 			bl SPR_moverSprite		@;Actualitza el moviment de l'sprite
 			@; void SPR_moverSprite(int indice, int px, int py)
 			add r3, #6				@;Acaba d'avançar fins al següent element

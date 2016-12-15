@@ -209,7 +209,7 @@ baja_verticales:
 		bl mod_random					@;Cridem mod random (genera aleatori entre 0 i 5)
 		add r0, #1						@;Sumem 1 per a corregir 
 		
-		push {r0-r2}						@;fase 2IC: Salvem estat del registre r1
+		push {r0-r2}					@;fase 2IC: Salvem estat del registre r1
 		mov r1, r5						@;fase 2IC: movem la fila on s'ha de crear l'sprite a r1 per a passar els paràmetres
 		bl crea_elemento				@;fase 2IC:	generacio del sprite (es passa per r0=tipus de gelatina, r1=fila, r2=columna)	
 		pop {r0-r2}						@;fase 2IC: Recuperem estat del registre r1
@@ -225,8 +225,6 @@ baja_verticales:
 		.whiletractar:					@;Bucle de tractament
 		sub r6, #COLUMNS				@;restem el valor de columnes per accedir a la casella superior
 		sub r5, #1						@;fase 2IC: Restem 1 a l'index
-		@;cmp r5, #-1						@;fase 2IC: Si la fila es -1, hem sortit de la matriu. Seria codi de la primera part pero l'etiqueto com a seeegona part per si dona problemes
-		@;beq .notractes					@;fase 2IC: Per tant si es -1 avança al següent element
 		ldrb r8, [r6]					@;Carreguem a r8 el contingut de la casella superior
 		cmp r8, #15						@;Si hi ha un "hueco"...
 		beq .whiletractar				@;...pugem una casella mes
