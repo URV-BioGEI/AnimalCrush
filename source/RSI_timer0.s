@@ -4,7 +4,7 @@
 @;=== Programador tarea 2E: aleix.marine@estudiants.urv.cat			  ===
 @;=== Programador tarea 2G: cristina.izquierdo@estudiants.urv.cat	  ===
 @;=== Programador tarea 2H: albert.canellas@estudiants.urv.cat		  ===
-@;=                                                       	        	=
+@;=                                                        	        	=
 
 .include "../include/candy2_incl.i"
 
