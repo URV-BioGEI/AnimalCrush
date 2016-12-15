@@ -131,14 +131,12 @@ void genera_mapa1(char mat[][COLUMNS])
 	de la pantalla. */
 void ajusta_imagen3(int ibg)
 {
-
 	int angle=0;
 	bgSetCenter(ibg, 256, 128);
 	angle=degreesToAngle(-90);
 	bgSetRotate(ibg, angle);
 	bgSetScroll(ibg, 140, 0);
 	bgUpdate();
-
 }
 
 
@@ -164,10 +162,8 @@ void init_grafA()
 
 // Tarea 2Da:
 	// reservar bancos A y B para fondo 3, a partir de 0x06020000
-
 		vramSetBankA(VRAM_A_MAIN_BG_0x06020000);							//Inicialitzacio de VRAM_A
 		vramSetBankB(VRAM_B_MAIN_BG_0x06040000);							//Inicialitzacio de VRAM_B
-
 	
 
 // Tarea 2Aa:

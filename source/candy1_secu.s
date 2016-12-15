@@ -1,8 +1,8 @@
 @;=                                                               		=
 @;=== candy1_secu.s: rutinas para detectar y elimnar secuencias 	  ===
 @;=                                                             	  	=
-@;=== Programador tarea 1C: bernat.bosca@estudiants.urv.cat				  ===
-@;=== Programador tarea 1D: bernat.bosca@estudiants.urv.cat				  ===
+@;=== Programador tarea 1C: bernat.bosca@estudiants.urv.cat			  ===
+@;=== Programador tarea 1D: bernat.bosca@estudiants.urv.cat			  ===
 @;=                                                           		   	=
 
 
@@ -117,7 +117,7 @@ elimina_secuencias:
 			.Lwcolumna:
 				cmp r3, r5
 				bge .Lwfinalcolumna
-				mul r11, r2, r4			@; R11: fila per a coordena
+				mul r11, r2, r5			@; R11: fila per a coordena
 				add r7, r11, r3			@; R7: coordena de la matriz
 				strb r6, [r1, r7]		@; guarda R6 en la matriz de marca a la posició R7
 				add r3, #1
@@ -129,38 +129,49 @@ elimina_secuencias:
 		.Lwfinalfila:
 		bl marcar_horizontales
 		bl marcar_verticales
-		mov r2, #0					@; R2: fila
-		mov r3, #0					@; R3: columna
+		mov r2, r0					@; R2: matriz de juego
+		mov r3, r1					@; R3: matriz de marcas
+		mov r0, #0					@; R0: fila
+		mov r1, #0					@; R1: columna
 		.Lwfila2:
-			cmp r2, r4
+			cmp r0, r4
 			bge .Lwfinalfila2
 			.Lwcolumna2:
-				cmp r3, r5
+				cmp r1, r5
 				bge .Lwfinalcolumna2
-				mul r11, r2, r4			@; R11: fila per a coordena
-				add r7, r11, r3			@; R7: coordena de la matriz
-				ldrb r8, [r1, r7]		@; R8: carrega el que hi ha en la coordena R7 de la matriz_marcas
+				mul r11, r0, r5			@; R11: fila per a coordena
+				add r7, r11, r1			@; R7: coordena de la matriz
+				ldrb r8, [r3, r7]		@; R8: carrega el que hi ha en la coordena R7 de la matriz_marcas
 				cmp r8, #0
 				beq .Lfinif
-				ldrb r9, [r0, r7]		@; R9: carrega el que hi ha en la coordena R7 de la matriz de juego
+				ldrb r9, [r2, r7]		@; R9: carrega el que hi ha en la coordena R7 de la matriz de juego
 				cmp r9, #14
 				ble .Lif
+				push {r0}
+				bl elimina_elemento
+				pop {r0}
+				bl elimina_gelatina
 				mov r10, #8				@; R10: guardar gelatina 8 en la matriz
-				strb r10, [r0, r7]
+				strb r10, [r2, r7]
 				b .Lfinif
 				.Lif:
-				cmp r9, #7
-				beq .Lfinif
-				cmp r9, #8
-				beq .Lfinif
-				mov r10, #0
-				strb r10, [r0, r7]		@; R10: guardar 0 en la matriz
+					cmp r9, #8
+					blgt elimina_gelatina	@; Si es mes gran de 8 sera una gelatina simple
+					cmp r9, #7
+					beq .Lfinif
+					cmp r9, #8
+					beq .Lfinif
+					push {r0}
+					bl elimina_elemento		@; guardem r0 perque la funcio retorna un valor
+					pop {r0}
+					mov r10, #0
+					strb r10, [r2, r7]		@; R10: guardar 0 en la matriz
 				.Lfinif:
-				add r3, #1
+				add r1, #1
 				b .Lwcolumna2
 			.Lwfinalcolumna2:
-			add r2, #1
-			mov r3, #0
+			add r0, #1
+			mov r1, #0
 			b .Lwfila2
 		.Lwfinalfila2:
 		pop {r2-r11, pc}
@@ -201,7 +212,7 @@ marcar_horizontales:
 				sub r10, r7, #1				@; R10: columna-1;
 				cmp r3, r10
 				bge .Lif23
-				mul r12, r2, r6				@; R12: fila per a coordena
+				mul r12, r2, r7				@; R12: fila per a coordena
 				add r11, r3, r12			@; R11: coordena matriz_marcas
 				ldrb r12, [r0, r11]			@; R12: veu que hi ha a la matriz_marcas en coordena R11
 				cmp r12, #7
@@ -221,7 +232,7 @@ marcar_horizontales:
 				mov r1, r11					@; R1: torna a ser matriz_marcas
 				cmp r8, #3
 				blt .Lif23
-				mul r12, r2, r6				@; R12: fila per a coordena
+				mul r12, r2, r7				@; R12: fila per a coordena
 				add r11, r3, r12			@; R11: coordena matriz_marcas
 				ldrb r12, [r1, r11]			@; R12: veu que hi ha a la matriz_marcas en coordena R11
 				cmp r12, #0
@@ -231,7 +242,7 @@ marcar_horizontales:
 					cmp r8, #0
 					beq .Lif23
 					sub r8, #1				@; num_repeticions--;
-					mul r12, r2, r6			@; R12: fila per a coordena
+					mul r12, r2, r7			@; R12: fila per a coordena
 					add r11, r3, r8
 					add r11, r12			@; R11: coordena [f][c+num_rep-1];
 					strb r9, [r1, r11]		@; guarda R9 en la matriz de marca a la posició R11
@@ -285,7 +296,7 @@ marcar_verticales:
 				sub r10, r6, #1				@; R10: fila-1;
 				cmp r2, r10
 				bge .Lfinwhile33
-				mul r12, r2, r6				@; R12: fila per a coordena
+				mul r12, r2, r7				@; R12: fila per a coordena
 				add r11, r3, r12			@; R11: coordena matriz_marcas
 				ldrb r12, [r0, r11]			@; R12: veu que hi ha a la matriz_marcas en coordena R11
 				cmp r12, #7
@@ -312,8 +323,8 @@ marcar_verticales:
 					cmp r8, #0
 					beq .Lfinwhileprova
 					sub r8, #1				@; num_rep--;
-					mul r12, r2, r6			@; fila per a coordena
-					mul r4, r8, r6			@; num_rep per a coordena
+					mul r12, r2, r7			@; fila per a coordena
+					mul r4, r8, r7			@; num_rep per a coordena
 					add r11, r12, r4
 					add r11, r3				@; R11: coordena[f+num_rep-1][c];
 					ldrb r12, [r1, r11]		@; R12: llig que hi ha a la coordena R11 de la matriz_marcas
@@ -334,8 +345,8 @@ marcar_verticales:
 						cmp r8, #0
 						beq .Lfinwhile33
 						sub r8, #1				@; num_rep--;
-						mul r12, r2, r6			@; R12: fila per a coordena
-						mul r5, r8, r6
+						mul r12, r2, r7			@; R12: fila per a coordena
+						mul r5, r8, r7
 						add r11, r12, r5
 						add r11, r3				@; R11: coordena []f+num_rep-1][c];
 						strb r4, [r1, r11]		@; guarda R4 en la matriz de marca a al posició R11
@@ -346,8 +357,8 @@ marcar_verticales:
 						cmp r8, #0
 						beq .Lfinwhile33
 						sub r8, #1				@; num_repeticions--;
-						mul r12, r2, r6			@; R12: fila per a coordena
-						mul r5, r8, r6
+						mul r12, r2, r7			@; R12: fila per a coordena
+						mul r5, r8, r7
 						add r11, r12, r5
 						add r11, r3				@; R11: coordena [f+num_rep-1][c];
 						strb r9, [r1, r11]		@; guarda R9 en la matriz de marca a la posició R11
