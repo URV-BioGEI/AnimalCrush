@@ -16,7 +16,12 @@
 	update_spr:	.hword	0			@;1 -> actualizar sprites
 		.global timer0_on
 	timer0_on:	.hword	0 			@;1 -> timer0 en marcha, 0 -> apagado
+<<<<<<< HEAD
 	divFreq0: .hword	-100
+=======
+	divFreq0: .hword	-13091,5			@;divisor de frecuencia inicial para timer 0 shouldichange
+
+>>>>>>> prog2
 
 @;-- .bss. variables (globales) no inicializadas ---
 .bss
@@ -90,7 +95,7 @@ activa_timer0:
 			ldr r1, =divF0					@;R1 = @divF0
 			strh r0, [r1]					@;divF0 = divfreq0
 			ldr r1, =0x04000100				@;R1 = Timer0_data
-			orr r0, #0xC30000				@; prescaler=11 (bit 0 i 1)-> f. entrada 32728,5 Hz, Timer IRQ Enable = 1 (bit 6)-> activades interrupcions, Timer Start/Stop = 1 (bit 7)-> activat timer.
+			orr r0, #0xC20000				@; prescaler=11 (bit 0 i 1)-> f. entrada 32728,5 Hz, Timer IRQ Enable = 1 (bit 6)-> activades interrupcions, Timer Start/Stop = 1 (bit 7)-> activat timer.
 			@;Es suma aquest valor control desplaçat 16 bits a l'esquerra amb el divisor de freq
 			str r0, [r1]					@;Guardem als dos registres de control
 			ldr r0, =timer0_on				@;R0 = @timer0_on
