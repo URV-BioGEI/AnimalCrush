@@ -204,6 +204,15 @@ baja_verticales:
 		mov r0, #6						@;Li passem un 6 a la rutina mod random
 		bl mod_random					@;Cridem mod random (genera aleatori entre 0 i 5)
 		add r0, #1						@;Sumem 1 per a corregir 
+<<<<<<< HEAD
+=======
+		
+		push {r0-r2}					@;fase 2IC: Salvem estat del registre r1
+		mov r1, r5						@;fase 2IC: movem la fila on s'ha de crear l'sprite a r1 per a passar els paràmetres
+		bl crea_elemento				@;fase 2IC:	generacio del sprite (es passa per r0=tipus de gelatina, r1=fila, r2=columna)	
+		pop {r0-r2}						@;fase 2IC: Recuperem estat del registre r1
+		
+>>>>>>> 14c9800c607a4c952fef8f5100a44c9bc0f15b34
 		add r8, r0						@;Sumem la gelatina que hi havia (que sera 0, 8 o 16) al aleatori corresponent
 		strb r8, [r7]					@;Guardem l'element generat a la posicio que li toca
 		mov r10, #1						@;Sortida de parametres
@@ -213,6 +222,10 @@ baja_verticales:
 		mov r6, r3						@;Salvem la posicio tractada a r6					
 		.whiletractar:					@;Bucle de tractament
 		sub r6, #COLUMNS				@;restem el valor de columnes per accedir a la casella superior
+<<<<<<< HEAD
+=======
+		sub r5, #1						@;fase 2IC: Restem 1 a l'index
+>>>>>>> 14c9800c607a4c952fef8f5100a44c9bc0f15b34
 		ldrb r8, [r6]					@;Carreguem a r8 el contingut de la casella superior
 		cmp r8, #15						@;Si hi ha un "hueco"...
 		beq .whiletractar				@;...pugem una casella mes
@@ -224,6 +237,7 @@ baja_verticales:
 		sub r12, r8, r9					@;i sino a la casella superior li treiem els bits de tipus
 		strb r12, [r6]					@;Guarda els bits de gelatina a la posicio on era (hem eliminat els de tipus) per tant quedara a 0, 8 o 16
 		ldrb r11, [r3]					@;Carreguem a r11 gelatina a tractar que sera 0, 8 o 16
+<<<<<<< HEAD
 		add r5, r11, r9					@;Suma bits de la casella a tractar mes el tipus de la que baixa
 		strb r5, [r3]					@;Guardaho a la casella tractada (la inferior)
 		mov r10, #1						@;Hem fet moviment per tant...
@@ -235,6 +249,30 @@ baja_verticales:
 		cmp r1, #1						@;si ha arribat a 1, Comparo fila amb 1
 		beq .Surt						@;i si tot es 1 ves a la sortida perque ja hem recorregut la matriu
 		mov r2, #COLUMNS				@;Si nomes la columna es 1, tornem a carregar el maxim numero de columnes...
+=======
+		add r6, r11, r9					@;Suma bits de la casella a tractar mes el tipus de la que baixa
+		
+		push {r0-r4}					@;fase 2IC: salvem estat del resgistres per a la passada de parametres
+		mov r0, r5 						@;fase 2IC: r0=fila origen
+		mov r4, r1						@;fase 2IC: Salvo el valor de fila destí
+		mov r1, r2						@;fase 2IC: r1=columna origen
+		mov r3, r2						@;fase 2IC: r3=columna destí (serà la mateixa que la origen degut a que es un desplaçament vertical)
+		mov r2, r4						@;fase 2IC: r2=fila destí
+		bl activa_elemento				@;fase 2IC: fila origen, columna origen, fila destí, columna destí	
+		pop {r0-r4}						@;fase 2IC: recuperem estat del resgistres
+		
+		strb r6, [r3]					@;Guardaho a la casella tractada (la inferior)
+		mov r10, #1						@;Hem fet moviment per tant...
+		@;SECCIO AVANÇAR/TRACTAMENT D'INDEX
+		.notractes:
+		sub r3, #1						@;Restem 1, com que les matrius en ARM són en realitat taules podem desplaçarnos restant 1 fins que l'element actual sigui la posicio base de la matriu
+		cmp r2, #0						@;Comprovem que l'index de columna no ha arribat a 0
+		bne .canvicolumna				@;Si no ha arribat a 0 canvia la columna
+		cmp r1, #0						@;si ha arribat a 0, Comparo fila amb 0
+		beq .Surt						@;i si tot es 0 ves a la sortida perque ja hem recorregut la matriu
+		mov r2, #COLUMNS				@;Si nomes la columna es 0, tornem a carregar el maxim numero de columnes...
+		sub r2, #1
+>>>>>>> 14c9800c607a4c952fef8f5100a44c9bc0f15b34
 		sub r1, #1						@;...restem una fila i 
 		b .whilemove					@;passem a la següent cel·la...
 		.canvicolumna:
@@ -315,6 +353,7 @@ baja_laterales:
 		bne .Dreta					@;Anem a la dreta arbitrariament
 		@;SECCIO ESQUERRA
 		.Esquerra:
+<<<<<<< HEAD
 		push {r0-r3}
 		mov r0, r1					@;R0=fila
 		sub r0, #1
@@ -324,8 +363,19 @@ baja_laterales:
 		sub r3, r1, #1				@;R3=columna destí
 		bl activa_elemento
 		pop {r0-r3}
+=======
+		
+		push {r0-r3}				@;Funcio I
+		mov r0, r1
+		mov r1, r2
+		add r2, r0, #1
+		sub r3, r1, #1
+		bl activa_elemento
+		pop {r0-r3}
+		
+>>>>>>> 14c9800c607a4c952fef8f5100a44c9bc0f15b34
 		sub r5, r3, #COLUMNS		@;Restar columnes
-		sub r5, r5, #1				@;restem 1 per a ajustar
+		sub r5, #1					@;restem 1 per a ajustar
 		ldrb r8, [r5]				@;Carregar a r8 el contingut de la posicio que sha de moure
 		and r9, r8, #24				@;Bit clear
 		strb r9, [r5]				@;Guarda els bits de mes pes on estaven
@@ -336,6 +386,7 @@ baja_laterales:
 		b .passaseguent				@;Sortim
 		@;SECCIO DRETA
 		.Dreta:
+<<<<<<< HEAD
 		push {r0-r3}
 		mov r0, r1					@;R0=fila
 		mov r1, r2					@;R1=columna
@@ -343,6 +394,17 @@ baja_laterales:
 		add r3, r1, #1				@;R3=columna destí
 		bl activa_elemento
 		pop {r0-r3}
+=======
+		
+		push {r0-r3}				@;Funcio I
+		mov r0, r1
+		mov r1, r2
+		add r2, r0, #1
+		add r3, r1, #1
+		bl activa_elemento
+		pop {r0-r3}
+		
+>>>>>>> 14c9800c607a4c952fef8f5100a44c9bc0f15b34
 		sub r5, r3, #COLUMNS		@;Restar columnes
 		add r5, r5, #1				@;sumem 1 per a ajustar
 		ldrb r8, [r5]				@;Carregar a r8 el contingut de la posicio que sha de moure
