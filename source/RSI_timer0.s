@@ -8,7 +8,6 @@
 
 .include "../include/candy2_incl.i"
 
-
 @;-- .data. variables (globales) inicializadas ---
 .data
 		.align 2
