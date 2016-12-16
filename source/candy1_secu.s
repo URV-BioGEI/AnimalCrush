@@ -40,7 +40,7 @@
 @;		R0 = 1 si hay una secuencia, 0 en otro caso
 	.global hay_secuencia
 hay_secuencia:
-		push {r1-r9, lr}
+		push {r1-r11, lr}
 		mov r1, #0					@; R1: fila
 		mov r2, #0					@; R2: columna
 		mov r4, #ROWS				@; R4: rows
@@ -49,13 +49,24 @@ hay_secuencia:
 		.LwhileFila:
 			cmp r1, r4
 			bge .LfiwhileFila
-			cmp r8, #3
-			bge .LfiwhileFila
 			.LwhileColum:
 				cmp r2, r5
 				bge .LfiwhileColum
-				cmp r8, #3
-				bge .LfiwhileFila
+				mul r10, r1, r5
+				add r10, r4
+				ldrb r11, [r0, r10]
+				cmp r11, #7
+				beq .Lif2
+				cmp r11, #8
+				beq .Lif2
+				cmp r11, #15
+				beq .Lif2
+				cmp r11, #16
+				beq .Lif2
+				cmp r11, #0
+				ble .Lif2
+				cmp r11, #23
+				bge .Lif2
 				sub r6, r4, #1				@; R6: fila-1;
 				cmp r1, r6
 				bge .Lif1
@@ -76,6 +87,8 @@ hay_secuencia:
 				mov r8, r0					@; R8: arreplega el valor retornat
 				mov r0, r9					@; R0: recupera matriz
 				.Lif2:
+				cmp r8, #3
+				bge .LfiwhileFila
 				add r2, #1
 				b .LwhileColum
 			.LfiwhileColum:
@@ -88,7 +101,7 @@ hay_secuencia:
 		bge .Lfifuncio
 			mov r0, #0
 		.Lfifuncio:
-		pop {r1-r9, pc}
+		pop {r1-r11, pc}
 
 
 
