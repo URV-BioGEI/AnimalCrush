@@ -64,7 +64,7 @@ desactiva_timer2:
 @;	la visualización de dicha metabaldosa.
 	.global rsi_timer2
 rsi_timer2:
-		push {r0-r6, lr}
+		push {r0-r5, lr}
 			ldr r0, =mat_gel			@;r0=mat_gel[][COLUMNS]
 			mov r1, #0					@;r1=index
 		.L_recorreMatGel:
@@ -75,9 +75,7 @@ rsi_timer2:
 			beq .Decrementar			@;si es positiu decrementar
 			b .L_final					@;si es -1 s'ha d'ignorar
 		.Aumentar_Actualizar:
-			ldr r4, =update_gel 		@;si el camp ii es un 0
-			mov r5, #1					@;posem un 1 a la variable update_gel
-			strb r5, [r4]				@;per actualitzar la metabaldosa
+			mov r2, #1					@;flag per update_gel
 			ldrb r3, [r0, #GEL_IM]			@;r3=camp im
 			add r3, #1
 			strb r3, [r0, #GEL_IM]			@;augmentem l'index im
@@ -103,8 +101,12 @@ rsi_timer2:
 			add r0, #GEL_TAM			@;seguent casella (char ii + char im)
 			cmp r1, #ROWS*COLUMNS					@;comparem amb el final de la matriu
 			ble .L_recorreMatGel		@;si es mes petit o igual al final, passem a la seguent casella
+			cmp r2, #1					@;comprovem el flag
+			ldr r4, =update_gel 		@;si el camp ii es un 0
+			mov r5, #1					@;posem un 1 a la variable update_gel
+			strb r5, [r4]				@;per actualitzar la metabaldosa
 		
-		pop {r0-r6, pc}
+		pop {r0-r5, pc}
 
 
 .end
