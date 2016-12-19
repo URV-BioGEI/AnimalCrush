@@ -9,10 +9,6 @@
 .include "../include/candy2_incl.i"
 
 
-<<<<<<< HEAD
-
-=======
->>>>>>> prog3
 @;-- .data. variables (globales) inicializadas ---
 .data
 		.align 2
