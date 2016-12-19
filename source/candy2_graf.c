@@ -21,7 +21,7 @@
 int n_sprites = 0;					// número total de sprites creados
 elemento vect_elem[ROWS*COLUMNS];	// vector de elementos
 gelatina mat_gel[ROWS][COLUMNS];	// matriz de gelatinas
-
+int mod_random(int n);
 
 
 // TAREA 2Ab
@@ -32,7 +32,7 @@ gelatina mat_gel[ROWS][COLUMNS];	// matriz de gelatinas
 void genera_sprites(char mat[][COLUMNS])
 {
 	int i,j;
-	
+	n_sprites=0;
 	for (i=0; i<ROWS*COLUMNS; i++)
 	{
 		vect_elem[i].ii=-1;
@@ -70,10 +70,10 @@ void genera_mapa2(char mat[][COLUMNS])
 	{
 		for (j=0; j<COLUMNS; j++)
 		{
-			if (mat[i][j]==15)	fijar_metabaldosa((u16 *) 0x06000800, i, j, 19);
+			if (mat[i][j]==15)	fijar_metabaldosa((u16 *) 0x06000000, i, j, 19);
 			else{
-				if ((i+j)%2==0) fijar_metabaldosa((u16 *) 0x06000800, i, j, 17);
-				else fijar_metabaldosa((u16 *) 0x06000800, i, j, 18);
+				if ((i+j)%2==0) fijar_metabaldosa((u16 *) 0x06000000, i, j, 17);
+				else fijar_metabaldosa((u16 *) 0x06000000, i, j, 18);
 			}
 		}
 	}
@@ -91,19 +91,16 @@ void genera_mapa2(char mat[][COLUMNS])
 	control de la animación de las gelatinas mat_gel[][COLUMNS]. */
 void genera_mapa1(char mat[][COLUMNS])
 {
-<<<<<<< HEAD
-
-=======
 	int i,j;
 	for (i=0; i<ROWS; i++)
 	{
 		for (j=0; j<COLUMNS; j++)
 		{
 			if (mat[i][j]==15 || (mat[i][j]!=7 && mat[i][j]<7)){ //ni bloque solido ni gelatina	
-				fijar_metabaldosa((u16 *) 0x06000000, i, j, 19);
+				fijar_metabaldosa((u16 *) 0x06001000, i, j, 19);
 			}
 			if (mat[i][j]==7){ //bloque solido	
-				fijar_metabaldosa((u16 *) 0x06000000, i, j, 16);
+				fijar_metabaldosa((u16 *) 0x06001000, i, j, 16);
 			}
 			if ((mat[i][j]>8 && mat[i][j]<15) || (mat[i][j]>16 && mat[i][j]<23)){ //gelatina	
 				int random = 8;
@@ -111,7 +108,7 @@ void genera_mapa1(char mat[][COLUMNS])
 				if ((mat[i][j]>16 && mat[i][j]<23)){ //gelatina doble
 				random = random+8;
 				}
-				fijar_metabaldosa((u16 *) 0x06000000, i, j, random);
+				fijar_metabaldosa((u16 *) 0x06001000, i, j, random);
 				int campo = 10; 
 				campo = mod_random(campo)+1; //numero aleatorio entre 1-10
 				mat_gel[i][j].ii=campo;
@@ -122,7 +119,6 @@ void genera_mapa1(char mat[][COLUMNS])
 			}
 		}
 	}
->>>>>>> prog3
 
 }
 
@@ -135,23 +131,12 @@ void genera_mapa1(char mat[][COLUMNS])
 	de la pantalla. */
 void ajusta_imagen3(int ibg)
 {
-<<<<<<< HEAD
 	int angle=0;
 	bgSetCenter(ibg, 256, 128);
 	angle=degreesToAngle(-90);
 	bgSetRotate(ibg, angle);
 	bgSetScroll(ibg, 140, 0);
 	bgUpdate();
-=======
-
-	int angle=0;
-	bgSetCenter(ibg, 256, 128);
-	angle=degreesToAngle(90);
-	bgSetRotate(ibg, angle);
-	bgSetScroll(ibg, 256, 128);
-	bgUpdate();
-
->>>>>>> remotes/origin/prog4
 }
 
 
@@ -177,18 +162,8 @@ void init_grafA()
 
 // Tarea 2Da:
 	// reservar bancos A y B para fondo 3, a partir de 0x06020000
-<<<<<<< HEAD
 		vramSetBankA(VRAM_A_MAIN_BG_0x06020000);							//Inicialitzacio de VRAM_A
 		vramSetBankB(VRAM_B_MAIN_BG_0x06040000);							//Inicialitzacio de VRAM_B
-=======
-	
-	vramSetBankA(VRAM_A_MAIN_BG_0x06020000);							//Inicialitzacio de VRAM_A
-	vramSetBankA(VRAM_B_MAIN_BG_0x06020000);							//Inicialitzacio de VRAM_B
-	bg3A = bgInit(3, BgType_ExRotation, BgSize_T_512x256, 0, 1);		//Inicialitzar fondo
-	bgSetPriority(bg3A, 3);												//Prioridad fondo
-	decompress(FondoBitmap, bgGetGfxPtr(bg3A), LZ77Vram);				//Cargar pixeles
-	ajusta_imagen3(3);
->>>>>>> remotes/origin/prog4
 	
 
 // Tarea 2Aa:
@@ -199,13 +174,13 @@ void init_grafA()
 		dmaCopy(SpritesPal, (unsigned int *) 0x05000200, sizeof(SpritesPal));	//  Sprite Palette display engine A =0x05000200 = SPRITE_PALETTE
 // Tarea 2Ba:
 	// inicializar el fondo 2 con prioridad 2
-		bg2A = bgInit(2, BgType_Text8bpp, BgSize_T_256x256, 1, 1);			//Inicialitzar fondo
+		bg2A = bgInit(2, BgType_Text8bpp, BgSize_T_256x256, 0, 0);			//Inicialitzar fondo
 		bgSetPriority(bg2A, 2);
 
 
 // Tarea 2Ca:
 	//inicializar el fondo 1 con prioridad 0
-		bg1A = bgInit(1, BgType_Text8bpp, BgSize_T_256x256, 0, 1); 			//Inicialitzar fondo 1 "text" (bg1) 8bpp 32x32
+		bg1A = bgInit(1, BgType_Text8bpp, BgSize_T_256x256, 2, 0); 			//Inicialitzar fondo 1 "text" (bg1) 8bpp 32x32
 		bgSetPriority(bg1A, 0);													//Priridat fondo 1 a nivell 0
 
 
@@ -214,8 +189,7 @@ void init_grafA()
 	// partir de la dirección de memoria correspondiente a los gráficos de
 	// las baldosas para los fondos 1 y 2, cargar los colores de paleta
 	// correspondientes contenidos en la variable BaldosasPal[]
-		decompress(BaldosasTiles, bgGetGfxPtr(bg2A), LZ77Vram);			//cargar baldosas fondo2
-		decompress(BaldosasTiles, bgGetGfxPtr(bg1A), LZ77Vram);			//cargar baldosas fondo1
+		decompress(BaldosasTiles, bgGetGfxPtr(bg2A), LZ77Vram);			//cargar baldosas
 		dmaCopy(BaldosasPal, BG_PALETTE, sizeof(BaldosasPal));				//cargar palette
 
 	

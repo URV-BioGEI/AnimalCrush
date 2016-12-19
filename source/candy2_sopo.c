@@ -379,6 +379,7 @@ void copia_mapa(char mat[][COLUMNS], int num_map)
 		for (j = 0; j < COLUMNS; j++)	// para todas las columnas
 		{
 			mat[i][j] = mapas[num_map][i][j];		// copia elemento (i,j)
+			//if (mapas[num_map][i][j]
 		}
 	}
 }

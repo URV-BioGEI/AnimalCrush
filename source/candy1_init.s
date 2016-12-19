@@ -74,7 +74,8 @@ inicializa_matriz:
 		beq .L_buclerandom
 		cmp r8, #16
 		beq .L_buclerandom
-		b .L_final					@;si es un objecte fixe, passem a la seguent casella
+		strb r8, [r4, r6]			@;si es un objecte fixe, copiem passem a la seguent casella
+		b .L_final					
 	.L_buclerandom:					@;bucle per asignar un numero aleatori, si forma un combinacio de 3, es busca un altre numero
 		mov r5, #0					@;netegem el temporal
 		mov r0, #6					@;li passem el maxim de rang aleatori
@@ -226,8 +227,15 @@ recombina_elementos:
 		mov r0, #ROWS				@;li passem a mod_random el limit del nombre de files
 		bl mod_random				@;generem un numero de fila aleatori
 		mov r5, r0					@;r5=valor fila random
+		push {r0-r3, r5, r11}
+		mov r0, r5					@;r0=fila origen
+		mov r3, r2					@;r3=columna destino
+		mov r2, r1					@;r2=fila destino
+		mov r1, r11					@;r1=columna origen
+		bl activa_elemento
+		pop {r0-r3, r5, r11}
 		mov r0, #COLUMNS			@;fem servir r0 de temporal per guardar el total de columnes
-		mla r10, r5, r0, r11		@;r10 = (index fila*columna)+index columna
+		mla r10, r5, r0, r11		@;r10 = (index fila*columna)+index columna casella aleatoria
 		ldrb r5, [r7, r10]			@;r5 = valor de mat_recomb1 a la casella aleatoria
 	@;hem de sumar el contador abans de tornar a començar el bucle (en cas de que trobem un 0)
 		add r9, #1					@;sumem 1 al contador

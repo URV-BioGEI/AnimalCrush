@@ -209,9 +209,20 @@ baja_verticales:
 		bl mod_random					@;Cridem mod random (genera aleatori entre 0 i 5)
 		add r0, #1						@;Sumem 1 per a corregir 
 		
+		
 		push {r0-r2}					@;fase 2IC: Salvem estat del registre r1
 		mov r1, r5						@;fase 2IC: movem la fila on s'ha de crear l'sprite a r1 per a passar els paràmetres
-		bl crea_elemento				@;fase 2IC:	generacio del sprite (es passa per r0=tipus de gelatina, r1=fila, r2=columna)	
+		bl crea_elemento				@;fase 2IC:	generacio del sprite (es passa per r0=tipus de gelatina, r1=fila, r2=columna)
+		@;b .nocopia
+	@;	ldr r0, =copia
+		@;ldr r0, [r0]
+		@;cmp r0, #0
+		@;beq .nocopia
+		@;ldr r0, =n_sprites
+		@;ldr r1, [r0]
+		@;add r1, #1
+		@;str r1, [r0]
+		@;.nocopia:
 		pop {r0-r2}						@;fase 2IC: Recuperem estat del registre r1
 		
 		add r8, r0						@;Sumem la gelatina que hi havia (que sera 0, 8 o 16) al aleatori corresponent
@@ -223,6 +234,8 @@ baja_verticales:
 		mov r5, r1						@;fase 2IC: Utilitzem el temporal r5 per a poder calcular la fila origen (paràmetre de activa_elemento)
 		mov r6, r3						@;Salvem la posicio tractada a r6					
 		.whiletractar:					@;Bucle de tractament
+		cmp r5, #0						@;fase 2IC: Si resulta que estem a la fila 0
+		beq .notractes					@;fase 2IC: torna a iterar perque te'n vas fora de la matriu
 		sub r6, #COLUMNS				@;restem el valor de columnes per accedir a la casella superior
 		sub r5, #1						@;fase 2IC: Restem 1 a l'index
 		ldrb r8, [r6]					@;Carreguem a r8 el contingut de la casella superior
@@ -289,38 +302,51 @@ baja_verticales:
 @;		r9 = Flag de posicio posible
 @;		r10= resultat de la funcio
 baja_laterales:
-		push {r0-r10, lr}
+		push {r1-r11, lr}
 		mov r1, #ROWS				@;Carreguem index fila
 		mov r2, #COLUMNS			@;Carreguem index columna	
-		mov r10, #0					@;No haurem fet cap moviment fins que no es faci el contrari
 		mla r3, r1, r2, r4			@;Apuntem a la primera posicio valida de la matriu
+		sub r1, #1
+		sub r2, #1
+		mov r10, #0					@;No haurem fet cap moviment fins que no es faci el contrari
+
 		sub r3, #1					@;restem 1 per a corregir
 		.buclewhile:
 		ldrb r6, [r3]				@;Carreguem contingut a r6
-		and r7, r6, #7				@;bit clear
-		cmp r7, #0					@;Comparem amb 0
+		cmp r6, #15
+		beq .passaseguent			@;Passem al següent element
+		cmp r6, #7
+		beq .passaseguent			@;Passem al següent element
+		and r6, #7					@;Netegem bits de gelatina
+		cmp r6, #0					@;Comparem amb 0
 		bne .passaseguent			@;Passem al següent element
 		mov r9, #0					@;posem flag a 0
 		@;Caselles de lesquerra
-		cmp r2, #1					@;mira si estas al limit esquerra de la matriu
+		cmp r2, #0					@;mira si estas al limit esquerra de la matriu
 		beq .comprovadret			@;Si estas al limit de la matriu passa a dret directament
 		sub r5, r3, #COLUMNS		@;Restar columnes
 		sub r5, r5, #1				@;restem 1 per a ajustar
 		ldrb r8, [r5]				@;Carregar a r8 el contingut de la posicio que sha de moure
-		and r8, r8, #7				@;filtrem bits
 		cmp r8, #7					@;comparem amb 7
 		beq .comprovadret			@;si no pots comprova lelement de la dreta
+		cmp r8, #15					@;comparem amb 15
+		beq .comprovadret			@;si no pots comprova lelement de la dreta
+		and r8, #7					@;Neteja bits de gelatina
 		cmp r8, #0					@;compara amb el 0 per a saber si lelement esta buit
 		addne r9, r9, #1			@;Afegeix al flag un 1
 		.comprovadret:
-		cmp r2, #COLUMNS			@;mira si estas al limit dret de la matriu
-		beq .fi						@;tractem l'element esquerra
+		mov r11, #COLUMNS
+		sub r11, #1
+		cmp r2, r11					@;mira si estas al limit dret de la matriu
+		beq .fi						@; i sino tractem l'element esquerra
 		sub r5, r3, #COLUMNS		@;Restar columnes
 		add r5, r5, #1				@;Afegim 1 a l'index per 
 		ldrb r8, [r5]				@;carrega la posicio de la dreta
-		and r8, r8, #7				@;filtrem bits
 		cmp r8, #7					@;comparem amb 7 
 		beq .fi						@;si no pots ves al fi
+		cmp r8, #15					@;comparem amb 15 
+		beq .fi						@;si no pots ves al fi
+		and r8, #7					@;Neteja bits de gelatina
 		cmp r8, #0					@;compara amb el 0 per a saber si lelement esta buit
 		addne r9, r9, #2			@;Afegeix dos al flag
 		.fi:
@@ -331,7 +357,7 @@ baja_laterales:
 		cmp r9, #0					@;Compara amb 0 el flag
 		beq .passaseguent			@;passa al seguent si no hi ha cap element susceptible de per baixat
 		@;SECCIO D'ELECCIO ALEATORIA
-		@; Llavors el flag es 9 i podem baixar pels dos llocs, per tant generem laleatori
+		@; Llavors el flag es 3 i podem baixar pels dos llocs, per tant generem laleatori
 		mov r0, #1					@;Carreguem un 1 a r0 (per a passar parametre)
 		bl mod_random				@;cridem mod random
 		cmp r0, #0					@;Si no es 0			
@@ -339,20 +365,23 @@ baja_laterales:
 		@;SECCIO ESQUERRA
 		.Esquerra:
 		
-		push {r0-r3}				@;Funcio I
-		mov r0, r1
-		mov r1, r2
-		add r2, r0, #1
-		sub r3, r1, #1
+		push {r0-r5}				@;Funcio I
+		mov r4, r1
+		mov r5, r2
+		sub r0, r4, #1
+		sub r1, r5, #1
+		mov r2, r4
+		mov r3, r5
+		
 		bl activa_elemento
-		pop {r0-r3}
+		pop {r0-r5}
 		
 		sub r5, r3, #COLUMNS		@;Restar columnes
 		sub r5, #1					@;restem 1 per a ajustar
 		ldrb r8, [r5]				@;Carregar a r8 el contingut de la posicio que sha de moure
 		and r9, r8, #24				@;Bit clear
 		strb r9, [r5]				@;Guarda els bits de mes pes on estaven
-		sub r8, r8, r9				@;obte el codi de menor pes
+		sub r8, r9					@;obte el codi de menor pes
 		add r9, r8, r6				@;Carrega a r9 el contingut de la posicio actual (sera 0, 8 o 16) mes el codi de  menys pes
 		strb r9, [r3]				@;Guarda a la posicio actual
 		mov r10, #1					@;Passada de parametres
@@ -360,13 +389,15 @@ baja_laterales:
 		@;SECCIO DRETA
 		.Dreta:
 		
-		push {r0-r3}				@;Funcio I
-		mov r0, r1
-		mov r1, r2
-		add r2, r0, #1
-		add r3, r1, #1
+		push {r0-r5}				@;Funcio I
+		mov r4, r1
+		mov r5, r2
+		sub r0, r4, #1
+		add r1, r5, #1
+		mov r2, r4
+		mov r3, r5
 		bl activa_elemento
-		pop {r0-r3}
+		pop {r0-r5}
 		
 		sub r5, r3, #COLUMNS		@;Restar columnes
 		add r5, r5, #1				@;sumem 1 per a ajustar
@@ -380,11 +411,12 @@ baja_laterales:
 		@;SECCIO AVANÇAR/TRACTAMENT D'INDEX
 		.passaseguent:
 		sub r3, r3, #1					@;restem 1 per decrementar lindex
-		cmp r2, #1						@;Comprovem que l'index de columna no ha arribat a 1
-		bne .passacolumna				@;Si no ha arribat a 1 canvia la columna
-		cmp r1, #2						@;si ha arribat a 1, Comparo fila amb 2
+		cmp r2, #0						@;Comprovem que l'index de columna no ha arribat a 0
+		bne .passacolumna				@;Si no ha arribat a 0 canvia la columna
+		cmp r1, #1						@;si ha arribat a 0, Comparo fila amb 1
 		beq .Sortir						@;i si tot es el limit ves a la sortida perque ja hem recorregut la matriu
 		mov r2, #COLUMNS				@;Si nomes la columna es 1, tornem a carregar COLUMNS a columnes...
+		sub r2, #1
 		sub r1, r1, #1					@;...restem una fila una fila i 
 		b .buclewhile					@;passem a la següent cel·la...
 		.passacolumna:
@@ -392,7 +424,7 @@ baja_laterales:
 		b .buclewhile					@;i passa a la següent cel·la...
 		.Sortir:
 		mov r0, r10	
-		pop {r0-r10,pc}
+		pop {r1-r11,pc}
 
 
 @;:::RUTINAS DE SOPORTE:::

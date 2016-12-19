@@ -53,7 +53,7 @@ hay_secuencia:
 				cmp r2, r5
 				bge .LfiwhileColum
 				mul r10, r1, r5
-				add r10, r4
+				add r10, r2
 				ldrb r11, [r0, r10]
 				cmp r11, #7
 				beq .Lif2

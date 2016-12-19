@@ -21,10 +21,11 @@
 /* variables globales */
 char matrix[ROWS][COLUMNS];		// matriz global de juego
 int seed32;						// semilla de números aleatorios
-int level = 0;					// nivel del juego (nivel inicial = 0)
+int level = 4;					// nivel del juego (nivel inicial = 0)
 int points;						// contador global de puntos
 int movements;					// número de movimientos restantes
 int gelees;						// número de gelatinas restantes
+//int copia=1;					// copia mapa activo o no
 
 
 
@@ -94,13 +95,8 @@ int main(void)
 	{
 		if (initializing)		//////	SECCIÓN DE INICIALIZACIÓN	//////
 		{
-<<<<<<< HEAD
 			inicializa_matriz(matrix, level);
 			//copia_mapa(matrix, 0);
-=======
-			//inicializa_matriz(matrix, level);
-			copia_mapa(matrix, 4);
->>>>>>> prog3
 			genera_sprites(matrix);
 			genera_mapa1(matrix);
 			genera_mapa2(matrix);
@@ -159,6 +155,7 @@ int main(void)
 					elimina_secuencias(matrix, mat_mar);
 					borra_puntuaciones();
 					points += calcula_puntuaciones(mat_mar);
+					//points += 1000; 		//cambiar
 					falling = 1;
 					fall_init = 1;
 					movements--;

@@ -4,7 +4,7 @@
 @;=== Programador tarea 2E: aleix.marine@estudiants.urv.cat			  ===
 @;=== Programador tarea 2G: cristina.izquierdo@estudiants.urv.cat	  ===
 @;=== Programador tarea 2H: albert.canellas@estudiants.urv.cat		  ===
-@;=                                                        	        	=
+@;=                                                       	        	=
 
 .include "../include/candy2_incl.i"
 
@@ -16,7 +16,7 @@
 	update_spr:	.hword	0			@;1 -> actualizar sprites
 		.global timer0_on
 	timer0_on:	.hword	0 			@;1 -> timer0 en marcha, 0 -> apagado
-	divFreq0: .hword	-100
+	divFreq0: .hword	5728
 
 @;-- .bss. variables (globales) no inicializadas ---
 .bss
@@ -36,56 +36,27 @@
 @;Tarea 2H: actualiza el desplazamiento del fondo 3
 	.global rsi_vblank
 rsi_vblank:
-		push {r0-r6,lr}
+		push {r0-r4,lr}
 			
-			ldr r0, =update_spr			@;r0=@update_spr
-			ldrh r1, [r0]				@;r1=update_spr
+			ldr r2, =update_spr			@;r0=@update_spr
+			ldrh r1, [r2]				@;r1=update_spr
 			cmp r1, #0
-			beq .E					@;Si es 0 (no s'han mogut els sprites), surt
-			mov r1, #0					@; R1=0
-			strh r1, [r0]				@; update_spr=0
+			beq .E						@;Si es 0 (no s'han mogut els sprites), surt
 			mov r0, #0x07000000
-			mov r3, #ROWS
-			mov r2, #COLUMNS
-			mul r1, r2, r3
-			
+			ldr r1, =n_sprites
+			ldr r1, [r1]
 			bl SPR_actualizarSprites	@; sino actualitza els sprites
+			mov r1, #0					@; R1=0
+			strh r1, [r2]				@; update_spr=0
+			
 			.E:
 			@;Aquí acaba la meva funció, tots els registres estan lliures.
 		
 @;Tarea 2Ga
-			ldr r1, =update_gel			@;r1=@update_gel
-			ldrh r0, [r1]				@;r0=update_gel
-			cmp r0, #0	
-			beq .seg					@;si esta desactivada ignora els següents passos
-			ldr r2, =mat_gel			@;r2=mat_gel[][COLUMNS]
-			mov r3, #0					@;r3=index
-			mov r4, #ROWS
-			mov r5, #COLUMNS	
-			mul r6, r4, r5				@;r6=ROWS*COLUMNS
-		.L_recorreMatGel:
-			ldrh r4, [r2]				@;r4=camp ii
-			cmp r4, #-1
-			beq .L_finalMat_gel			@;si es -1 o superior a 0, ignorem la posicio
-			cmp r4, #0
-			bhi .L_finalMat_gel
-			mov r5, #10					@;sino:
-			strh r5, [r2]				@;guardem 10 al camp ii
-			ldrh r0, [r2, #2]			@;r0=camp im
-			bl fijar_metabaldosa
-		.L_finalMat_gel:
-			add r3, #1
-			add r2, #4					@;seguent casella (words)
-			cmp r3, r6					@;comparem amb el final de la matriu
-			bls .L_recorreMatGel		@;si es mes petit o igual al final, passem a la seguent casella
-			mov r0, #0
-			str r0, [r1]				@;desactivem update_gel
-		
-		.seg:
+
 
 @;Tarea 2Ha
 	
-<<<<<<< HEAD
 			ldr r1, =update_bg3
 			ldrh r2, [r1]
 			cmp r2, #0							@;comparacio de update_bg3
@@ -98,26 +69,7 @@ rsi_vblank:
 			mov r2, #0
 			strh r2, [r1]
 			.Ends: 
-<<<<<<< HEAD
 		pop {r0-r4, pc}
-=======
-	ldr r1, =update_bg3
-	ldr r2, [r1]
-	cmp r2, #0
-	beq .Lfi2ha
-	ldr r3, =offsetBG3X
-	ldr r4, [r3]
-	and r4, #0x00FF
-	ldr r3, =BG3X
-	strb r4, [r4]
-	mov r2, #0
-	str r2, [r1]
-	.Lfi2ha:	
-		pop {pc}
->>>>>>> remotes/origin/prog4
-=======
-		pop {r0-r6, pc}
->>>>>>> 22eded5
 
 
 
@@ -136,14 +88,17 @@ activa_timer0:
 			ldrh r0, [r0]					@;R0 = divfreq0
 			ldr r1, =divF0					@;R1 = @divF0
 			strh r0, [r1]					@;divF0 = divfreq0
-			ldr r1, =0x04000100				@;R1 = Timer0_data
-			orr r0, #0xC30000				@; prescaler=11 (bit 0 i 1)-> f. entrada 32728,5 Hz, Timer IRQ Enable = 1 (bit 6)-> activades interrupcions, Timer Start/Stop = 1 (bit 7)-> activat timer.
-			@;Es suma aquest valor control desplaçat 16 bits a l'esquerra amb el divisor de freq
-			str r0, [r1]					@;Guardem als dos registres de control
+			ldr r1, =0x04000100				@;R1 = @Timer0_data
+			rsb r0, r0, #0
+			strh r0, [r1]					@;Timer0_data = divfreq0
+			.Fi:
+			ldr r1, =0x04000102				@;R1 = @Timer0_control
+			mov r0, #0xC1
+			strh r0, [r1]					@; prescaler=11 (bit 0 i 1)-> f. entrada 32728,5 Hz, Timer IRQ Enable = 1 (bit 6)-> activades interrupcions, Timer Start/Stop = 1 (bit 7)-> activat timer.
 			ldr r0, =timer0_on				@;R0 = @timer0_on
 			mov r1, #1						@;R1 = 1
-			str r1, [r0]					@;timer0_on = 1 -> els sprites s'estan movent, activem timer 0
-			.Fi:
+			strh r1, [r0]					@;timer0_on = 1 -> els sprites s'estan movent, activem timer 0
+			
 		pop {r0, r1, pc}
 
 
@@ -154,10 +109,9 @@ desactiva_timer0:
 		push {r0, r1,lr}
 			ldr r0, =timer0_on		@;R0 = @timer0_on
 			mov r1, #0				@;R1 = 0
-			str r1, [r0] 			@;Timer0_on = 0
+			strh r1, [r0] 			@;Timer0_on = 0
 			ldr r0, =0x04000102		@;R0 = @Timer0_control
-			ldrh r1, [r0]			@;R1 = Timer0_control
-			bic r1, #128			@;Posem Timer Start/Stop (bit 7)  a 0 (desactiva timer)
+			mov r1, #0				@;Posem Timer Start/Stop (bit 7)  a 0 (desactiva timer)
 			strh r1, [r0]			@;Timer0_control = 0x4300 
 		pop {r0, r1,pc}
 
@@ -176,10 +130,10 @@ desactiva_timer0:
 @;	ii, px, py, vx, vy
 	.global rsi_timer0
 rsi_timer0:
-		push {r0-r6,lr}
-			mov r0, #ROWS
-			mov r1, #COLUMNS
-			mul r6, r1, r0			@;Calculem max desplaçament per vect elem
+		push {r0-r7,lr}
+			ldr r6, =n_sprites
+			ldr r6, [r6]
+
 			mov r4, #0				@;R4 = 0 servirà per a saber si hi ha hagut moviment ja que sempre que n'hi hagi r4=1
 			ldr r3, =vect_elem		@;R3 = @vect_elem 
 			mov r0, #0				@;R0 = Index desplaçament
@@ -199,27 +153,31 @@ rsi_timer0:
 			ldrh r5, [r3, #4]		@;R5 = vx
 			cmp r5, #0				@;si vx...
 			beq .x
-			tst r5, #0x8000
-			addeq r1, #1			@;Major que 0, suma 1 als pixels
-			subne r1, #1			@;Menor que 0, resta 1 als pixels
+			
+			add r1, r5
+			@;tst r5, #0x8000
+			@;addeq r1, #1			@;Major que 0, suma 1 als pixels
+			@;subne r1, #1			@;Menor que 0, resta 1 als pixels
 			strh r1, [r3]			@;Guarda contingut R2 = px a on li toca
+			 
 			.x:
 			add r3, #2				@;Augmenta l'index en dos (avança al seguent hword)
 			ldrh r2, [r3]			@;R2 = py
 			ldrh r5, [r3, #4]		@;R5 = vy
 			cmp r5, #0				@;si vx...
 			beq .y
-			tst r5, #0x8000
-			addeq r2, #1			@;Major que 0, suma 1 als pixels
-			subne r2, #1			@;Menor que 0, resta 1 als pixels
-			strh r1, [r3]			@;Guarda contingut R2 = px a on li toca
+			add r2, r5
+			@;tst r5, #0x8000
+			@;addeq r2, #1			@;Major que 0, suma 1 als pixels
+			@;subne r2, #1			@;Menor que 0, resta 1 als pixels
+			strh r2, [r3]			@;Guarda contingut R2 = px a on li toca
 			.y:
 			bl SPR_moverSprite		@;Actualitza el moviment de l'sprite
 			@; void SPR_moverSprite(int indice, int px, int py)
 			add r3, #6				@;Acaba d'avançar fins al següent element
 			.Endb:
 			add r0, #1				@;Suma 1 a l'índex
-			cmp r0, r6				@;Si l'index no es ROWS*COLUMNS
+			cmp r0, r6				@;Si l'index no arriba a n_sprites
 			bne .b					@;Torna a iterar
 			cmp r4, #1				@;Si flag de moviment es 0
 			blne desactiva_timer0	@;Desactiva timer 0 per a quan no hi ha moviment
@@ -227,14 +185,15 @@ rsi_timer0:
 			ldr r0, =update_spr		@;Sino carrega update_spr=r0
 			mov r1, #1				@;R1 = 1
 			strh r1, [r0]			@;Activa-la guardant un 1
-			ldr r1, =0x04000100 	@;R1 = @timer0 data
-			ldrh r0, [r1]			@;R0 = timer0_data
-			cmp r0, #-128			@;Si r0 (div freq) major que -128
-			bge .fin				@;Surt
-			add r0, #10				@;i sino Suma 10 (valor a modificar al fer proves), això disminuirà el valor del div_fre, ja que es negatiu
+			ldr r1, =divF0		 	@;R1 = @divf0
+			ldrh r0, [r1]			@;R0 = divf0
+			cmp r0, #300			@;Si r0 (div freq) menor o igual que 20
+			blo .fin				@;Surt
+			sub r0, #500				@;i sino resta 1024 (valor a modificar al fer proves)
 			strh r0, [r1]			@;Guarda'l
 			.fin:
-		pop {r0-r6, pc}
+			mov r0,r7
+		pop {r0-r7, pc}
 
 
 
