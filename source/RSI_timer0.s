@@ -4,9 +4,10 @@
 @;=== Programador tarea 2E: aleix.marine@estudiants.urv.cat			  ===
 @;=== Programador tarea 2G: cristina.izquierdo@estudiants.urv.cat	  ===
 @;=== Programador tarea 2H: albert.canellas@estudiants.urv.cat		  ===
-@;=                                                       	        	=
+@;=                                                        	        	=
 
 .include "../include/candy2_incl.i"
+
 
 
 @;-- .data. variables (globales) inicializadas ---
@@ -58,6 +59,7 @@ rsi_vblank:
 
 @;Tarea 2Ha
 	
+<<<<<<< HEAD
 			ldr r1, =update_bg3
 			ldrh r2, [r1]
 			cmp r2, #0							@;comparacio de update_bg3
@@ -71,6 +73,21 @@ rsi_vblank:
 			strh r2, [r1]
 			.Ends: 
 		pop {r0-r4, pc}
+=======
+	ldr r1, =update_bg3
+	ldr r2, [r1]
+	cmp r2, #0
+	beq .Lfi2ha
+	ldr r3, =offsetBG3X
+	ldr r4, [r3]
+	and r4, #0x00FF
+	ldr r3, =BG3X
+	strb r4, [r4]
+	mov r2, #0
+	str r2, [r1]
+	.Lfi2ha:	
+		pop {pc}
+>>>>>>> remotes/origin/prog4
 
 
 

@@ -104,12 +104,23 @@ void genera_mapa1(char mat[][COLUMNS])
 	de la pantalla. */
 void ajusta_imagen3(int ibg)
 {
+<<<<<<< HEAD
 	int angle=0;
 	bgSetCenter(ibg, 256, 128);
 	angle=degreesToAngle(-90);
 	bgSetRotate(ibg, angle);
 	bgSetScroll(ibg, 140, 0);
 	bgUpdate();
+=======
+
+	int angle=0;
+	bgSetCenter(ibg, 256, 128);
+	angle=degreesToAngle(90);
+	bgSetRotate(ibg, angle);
+	bgSetScroll(ibg, 256, 128);
+	bgUpdate();
+
+>>>>>>> remotes/origin/prog4
 }
 
 
@@ -135,8 +146,18 @@ void init_grafA()
 
 // Tarea 2Da:
 	// reservar bancos A y B para fondo 3, a partir de 0x06020000
+<<<<<<< HEAD
 		vramSetBankA(VRAM_A_MAIN_BG_0x06020000);							//Inicialitzacio de VRAM_A
 		vramSetBankB(VRAM_B_MAIN_BG_0x06040000);							//Inicialitzacio de VRAM_B
+=======
+	
+	vramSetBankA(VRAM_A_MAIN_BG_0x06020000);							//Inicialitzacio de VRAM_A
+	vramSetBankA(VRAM_B_MAIN_BG_0x06020000);							//Inicialitzacio de VRAM_B
+	bg3A = bgInit(3, BgType_ExRotation, BgSize_T_512x256, 0, 1);		//Inicialitzar fondo
+	bgSetPriority(bg3A, 3);												//Prioridad fondo
+	decompress(FondoBitmap, bgGetGfxPtr(bg3A), LZ77Vram);				//Cargar pixeles
+	ajusta_imagen3(3);
+>>>>>>> remotes/origin/prog4
 	
 
 // Tarea 2Aa:
