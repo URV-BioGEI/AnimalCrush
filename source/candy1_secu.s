@@ -158,18 +158,17 @@ elimina_secuencias:
 				cmp r8, #0
 				beq .Lfinif
 				ldrb r9, [r2, r7]		@; R9: carrega el que hi ha en la coordena R7 de la matriz de juego
+				cmp r9, #8
+				blge elimina_gelatina	@; Si es mes gran de 8 sera una gelatina simple
 				cmp r9, #14
 				ble .Lif
 				push {r0}
 				bl elimina_elemento
 				pop {r0}
-				bl elimina_gelatina
 				mov r10, #8				@; R10: guardar gelatina 8 en la matriz
 				strb r10, [r2, r7]
 				b .Lfinif
 				.Lif:
-					cmp r9, #8
-					blge elimina_gelatina	@; Si es mes gran de 8 sera una gelatina simple
 					cmp r9, #7
 					beq .Lfinif
 					cmp r9, #8
@@ -228,7 +227,11 @@ marcar_horizontales:
 				mul r12, r2, r7				@; R12: fila per a coordena
 				add r11, r3, r12			@; R11: coordena matriz_marcas
 				ldrb r12, [r0, r11]			@; R12: veu que hi ha a la matriz_marcas en coordena R11
+				cmp r12, #0
+				beq .Lif23
 				cmp r12, #7
+				beq .Lif23
+				cmp r12, #8
 				beq .Lif23
 				cmp r12, #15				@; si a la casella hi ha un 7 o 15 saltem al final
 				beq .Lif23
@@ -312,7 +315,11 @@ marcar_verticales:
 				mul r12, r2, r7				@; R12: fila per a coordena
 				add r11, r3, r12			@; R11: coordena matriz_marcas
 				ldrb r12, [r0, r11]			@; R12: veu que hi ha a la matriz_marcas en coordena R11
+				cmp r12, #0
+				beq .Lfinwhile33
 				cmp r12, #7
+				beq .Lfinwhile33
+				cmp r12, #8
 				beq .Lfinwhile33
 				cmp r12, #15				@; si a la casella hi ha un 7 o 15 saltem al final
 				beq .Lfinwhile33
