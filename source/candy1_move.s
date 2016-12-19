@@ -210,11 +210,16 @@ baja_verticales:
 		add r0, #1						@;Sumem 1 per a corregir 
 		
 		
-		push {r0-r2}					@;fase 2IC: Salvem estat del registre r1
-		mov r1, r5						@;fase 2IC: movem la fila on s'ha de crear l'sprite a r1 per a passar els paràmetres
+		push {r0-r3}					@;fase 2IC: Salvem estat del registre r1
+		mov r1, #-1						@;fase 2IC: movem la fila on s'ha de crear l'sprite a r1 per a passar els paràmetres
 		bl crea_elemento				@;fase 2IC:	generacio del sprite (es passa per r0=tipus de gelatina, r1=fila, r2=columna)
+		mov r0, #-1
+		mov r1, r2
+		mov r2, r5
+		mov r3, r1
+		bl activa_elemento
 		@;b .nocopia
-	@;	ldr r0, =copia
+		@;ldr r0, =copia
 		@;ldr r0, [r0]
 		@;cmp r0, #0
 		@;beq .nocopia
@@ -223,7 +228,7 @@ baja_verticales:
 		@;add r1, #1
 		@;str r1, [r0]
 		@;.nocopia:
-		pop {r0-r2}						@;fase 2IC: Recuperem estat del registre r1
+		pop {r0-r3}						@;fase 2IC: Recuperem estat del registre r1
 		
 		add r8, r0						@;Sumem la gelatina que hi havia (que sera 0, 8 o 16) al aleatori corresponent
 		strb r8, [r7]					@;Guardem l'element generat a la posicio que li toca

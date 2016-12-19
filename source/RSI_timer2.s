@@ -65,6 +65,7 @@ desactiva_timer2:
 	.global rsi_timer2
 rsi_timer2:
 		push {r0-r6, lr}
+		pop {r0-r6, pc}
 			ldr r0, =mat_gel			@;r0=mat_gel[][COLUMNS]
 			mov r1, #0					@;r1=index
 			mov r2, #ROWS
@@ -108,7 +109,7 @@ rsi_timer2:
 			cmp r1, r6					@;comparem amb el final de la matriu
 			ble .L_recorreMatGel		@;si es mes petit o igual al final, passem a la seguent casella
 		
-		pop {r0-r6, pc}
+		
 
 
 .end
