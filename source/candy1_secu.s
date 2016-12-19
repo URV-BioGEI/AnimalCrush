@@ -169,7 +169,7 @@ elimina_secuencias:
 				b .Lfinif
 				.Lif:
 					cmp r9, #8
-					blgt elimina_gelatina	@; Si es mes gran de 8 sera una gelatina simple
+					blge elimina_gelatina	@; Si es mes gran de 8 sera una gelatina simple
 					cmp r9, #7
 					beq .Lfinif
 					cmp r9, #8

@@ -16,7 +16,7 @@
 	update_spr:	.hword	0			@;1 -> actualizar sprites
 		.global timer0_on
 	timer0_on:	.hword	0 			@;1 -> timer0 en marcha, 0 -> apagado
-	divFreq0: .hword	5728
+	divFreq0: .hword	-5728
 
 @;-- .bss. variables (globales) no inicializadas ---
 .bss
@@ -36,7 +36,7 @@
 @;Tarea 2H: actualiza el desplazamiento del fondo 3
 	.global rsi_vblank
 rsi_vblank:
-		push {r0-r4,lr}
+		push {r0-r7,lr}
 			
 			ldr r2, =update_spr			@;r0=@update_spr
 			ldrh r1, [r2]				@;r1=update_spr
@@ -48,41 +48,40 @@ rsi_vblank:
 			bl SPR_actualizarSprites	@; sino actualitza els sprites
 			mov r1, #0					@; R1=0
 			strh r1, [r2]				@; update_spr=0
-			
 			.E:
-			@;Aquí acaba la meva funció, tots els registres estan lliures.
-		
 @;Tarea 2Ga
-
-			ldr r1, =update_gel			@;r1=@update_gel
-			ldrh r0, [r1]				@;r0=update_gel
-			cmp r0, #0	
-			beq .seg					@;si esta desactivada ignora els següents passos
-			ldr r2, =mat_gel			@;r2=mat_gel[][COLUMNS]
-			mov r3, #0					@;r3=index
-			mov r4, #ROWS
-			mov r5, #COLUMNS	
-			mul r6, r4, r5				@;r6=ROWS*COLUMNS
-		.L_recorreMatGel:
-			ldrh r4, [r2]				@;r4=camp ii
-			cmp r4, #-1
-			beq .L_finalMat_gel			@;si es -1 o superior a 0, ignorem la posicio
-			cmp r4, #0
-			bhi .L_finalMat_gel
-			mov r5, #10					@;sino:
-			strh r5, [r2]				@;guardem 10 al camp ii
-			ldrh r0, [r2, #2]			@;r0=camp im
-			bl fijar_metabaldosa
-		.L_finalMat_gel:
-			add r3, #1
-			add r2, #4					@;seguent casella (words)
-			cmp r3, r6					@;comparem amb el final de la matriu
-			bls .L_recorreMatGel		@;si es mes petit o igual al final, passem a la seguent casella
-			mov r0, #0
-			str r0, [r1]				@;desactivem update_gel
-		.seg:
+			ldr r4, =update_gel
+			ldrb r2, [r4]					@; valor de udate_gel
+			cmp r2, #0
+			beq .Lfi_rsi_vbank_2ga			@; si es igual a 0, finalitza
+			ldr r5, =mat_gel
+			mov r6, #COLUMNS
+			mov r1, #ROWS
+		.Ldecrementa_fila_2ga:
+			sub r1, #1
+			mov r2, #COLUMNS
+		.Ldecrementa_columna_2ga:
+			sub r2, #1
+			mla r3, r1, r6, r2				@; possicio_actual = fila_actual * COLUMNS + columna_actual
+			mov r7, r3, lsl #2				@; multipliquem r6*2 (un element de la matriu d'estructures ocupa 2 possicions) "direccio baldosa+contungut"? 2Bytes
+			ldrsb r0, [r5, r7]				@; ldrsb, perque el valor a carregar es signed extended, pot ser -1
+			cmp r0, #0						@; comparem valor de matriu.ii amb 0
+			bne .Lignorar_possicio_2ga
+			mov r0, #10						@; reiniciar valor matriu.ii a 10
+			strb r0, [r5, r7]
+			add r7, #1						@; anem a possicio matriu.im
+			ldrb r3, [r5, r7]				@; carrega valor matriu.im
+			ldr r0, =0x06000000				@; mov r0, #0x06000000
+			bl fijar_metabaldosa			@; fijar_metabaldosa (r0=0x06000000, r1=fila, r2=columna, r3=matriu.im)
+		.Lignorar_possicio_2ga:
+			cmp r2, #0
+			bgt .Ldecrementa_columna_2ga
+			cmp r1, #0
+			bgt .Ldecrementa_fila_2ga
+			mov r1, #0
+			strb r1, [r4]					@; guarda a update_gel un 0
+		.Lfi_rsi_vbank_2ga:
 @;Tarea 2Ha
-	
 			ldr r1, =update_bg3
 			ldrh r2, [r1]
 			cmp r2, #0							@;comparacio de update_bg3
@@ -95,7 +94,7 @@ rsi_vblank:
 			mov r2, #0
 			strh r2, [r1]
 			.Ends: 
-		pop {r0-r4, pc}
+		pop {r0-r7, pc}
 
 
 

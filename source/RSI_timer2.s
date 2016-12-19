@@ -14,7 +14,7 @@
 	update_gel:	.hword	0			@;1 -> actualizar gelatinas
 		.global timer2_on
 	timer2_on:	.hword	0 			@;1 -> timer2 en marcha, 0 -> apagado
-	divFreq2: .hword	-13091,5		@;divisor de frecuencia para timer 2 per a fer 10 canvis de metabaldosa per segon, amb una freq. d'entrada de 130.914,9921875 Hz
+	divFreq2: .hword	-3343,374		@;divisor de frecuencia para timer 2 per a fer 10 canvis de metabaldosa per segon, amb una freq. d'entrada de 130.914,9921875 Hz
 
 
 
@@ -36,7 +36,7 @@ b .puti
 		ldr r0, =0x04000108 	@;r0=@registre de dades del timer2
 		ldr r1, =divFreq2		@;r1=@divisor de freq
 		ldrh r2, [r1]
-		orr r2, #0x00C30000		@;activar timer2
+		orr r2, #0x00C00000		@;activar timer2
 		str r2, [r0]
 		pop {r0-r2, pc}
 
