@@ -115,9 +115,7 @@ void genera_mapa1(char mat[][COLUMNS])
 				mat_gel[i][j].ii=campo;
 				mat_gel[i][j].im=random;
 			}
-			if (mat[i][j]<7){ //no gelatina
-				mat_gel[i][j].ii=-1;
-			}
+			else mat_gel[i][j].ii=-1; //no gelatina
 		}
 	}
 

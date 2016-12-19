@@ -53,34 +53,36 @@ rsi_vblank:
 			ldr r4, =update_gel
 			ldrb r2, [r4]					@; valor de udate_gel
 			cmp r2, #0
-			beq .Lfi_rsi_vbank_2ga			@; si es igual a 0, finalitza
+			beq .Lfi						@; si es igual a 0, finalitza
 			ldr r5, =mat_gel
-			mov r6, #COLUMNS
-			mov r1, #ROWS
-		.Ldecrementa_fila_2ga:
-			sub r1, #1
-			mov r2, #COLUMNS
-		.Ldecrementa_columna_2ga:
-			sub r2, #1
-			mla r3, r1, r6, r2				@; possicio_actual = fila_actual * COLUMNS + columna_actual
-			mov r7, r3, lsl #1				@; multipliquem r6*2 (un element de la matriu d'estructures ocupa 2 possicions) "direccio baldosa+contungut"? 2Bytes
-			ldrsb r0, [r5, r7]				@; ldrsb, perque el valor a carregar es signed extended, pot ser -1
-			cmp r0, #0						@; comparem valor de matriu.ii amb 0
-			bne .Lignorar_possicio_2ga
-			mov r0, #10						@; reiniciar valor matriu.ii a 10
-			strb r0, [r5, r7]
-			add r7, #1						@; anem a possicio matriu.im
-			ldrb r3, [r5, r7]				@; carrega valor matriu.im
-			ldr r0, =0x06000000				@; mov r0, #0x06000000
-			bl fijar_metabaldosa			@; fijar_metabaldosa (r0=0x06000000, r1=fila, r2=columna, r3=matriu.im)
-		.Lignorar_possicio_2ga:
-			cmp r2, #0
-			bgt .Ldecrementa_columna_2ga
-			cmp r1, #0
-			bgt .Ldecrementa_fila_2ga
-			mov r1, #0
-			strb r1, [r4]					@; guarda a update_gel un 0
-		.Lfi_rsi_vbank_2ga:
+			mov r1, #0						@;r1=files
+		.bucleFil:
+			mov r2, #0						@;r2=columnes
+		.bucleCol:
+			ldrb r6, [r5, #GEL_II]			@;r1=camp ii
+			cmp r6, #0
+			bgt .L_final					@;si es major que 0, ignorem la posicio
+			tst r6, #0x80					@;comparem el bit de signe (1000 0000)
+			bne .L_final					@;si es -1, ignorem la posicio
+			@;si el camp ii es igual a 0
+			mov r6, #10
+			strb r6, [r5]					@;reinicialitzem a 10 el camp ii
+			ldr r0, =0x06000000				@;r0=direccio base matriu
+			@;r1=filas
+			@;r2=columnas
+			ldrb r3, [r5, #GEL_IM]			@;r3=camp im
+			bl fijar_metabaldosa
+		.L_final:
+			add r2, #1						@;seguent columna
+			add r5, #GEL_TAM				@;seguent casella
+			cmp r2, #COLUMNS				@;comparem amb el final de columna
+			blo .bucleCol
+			add r1, #1						@;seguent fila
+			cmp r1, #ROWS					@;comparem amb el final de les files
+			blo .bucleFil
+			mov r0, #0
+			strb r0, [r4]					@;desactivem update_gel
+		.Lfi:
 @;Tarea 2Ha
 			ldr r1, =update_bg3
 			ldrh r2, [r1]
