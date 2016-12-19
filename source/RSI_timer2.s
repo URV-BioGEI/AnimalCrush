@@ -28,19 +28,17 @@
 @;activa_timer2(); rutina para activar el timer 2.
 	.global activa_timer2
 activa_timer2:
-b .puti
-		push {r0-r2, lr}
+		push {r0-r3, lr}
 		ldr r0, =timer2_on		@;r0=@timer2_on
 		mov r1, #1
 		strh r1, [r0]			@;posem timer2_on = 1
 		ldr r0, =0x04000108 	@;r0=@registre de dades del timer2
 		ldr r1, =divFreq2		@;r1=@divisor de freq
 		ldrh r2, [r1]
-		orr r2, #0x00C00000		@;activar timer2
-		str r2, [r0]
-		pop {r0-r2, pc}
+		orr r3, r2, #0x00C10000		@;activar timer2
+		str r3, [r0]
+		pop {r0-r3, pc}
 
-.puti:
 @;TAREA 2Gc;
 @;desactiva_timer2(); rutina para desactivar el timer 2.
 	.global desactiva_timer2
@@ -78,33 +76,35 @@ rsi_timer2:
 			ldrb r3, [r0]				@;r3=camp ii
 			cmp r3, #0
 			beq .Aumentar_Actualizar
-			bgt .Decrementar
+			tst r5, #0x80				@;comparem el bit de signe
+			bne .Decrementar
+			b .L_final					@;pa porsia
 		.Aumentar_Actualizar:
 			ldr r4, =update_gel 		@;si el camp ii es un 0
 			mov r5, #1					@;posem un 1 a la variable update_gel
 			strb r5, [r4]				@;per actualitzar la metabaldosa
 			ldrb r3, [r0, #1]			@;r3=camp im
 			add r3, #1
-			strb r3, [r0, #1]			@;augmentem l'index
+			strb r3, [r0, #1]			@;augmentem l'index im
 			cmp r3, #7					@;final simple
 			bgt .Fsimple
 			cmp r3, #15					@;final soble
 			bgt .Fdoble
 		.Fsimple:
 			mov r3, #0
-			strb r3, [r0, #1]			@;tornem al index inicial de la simple
+			strb r3, [r0, #1]			@;tornem al index im inicial de la simple
 			b .L_final
 		.Fdoble:
 			mov r3, #8
-			strb r3, [r0, #1]			@;tornem al index inicial de la doble
+			strb r3, [r0, #1]			@;tornem al index im inicial de la doble
 			b .L_final
 		.Decrementar:
 			sub r3, #1					@;si es superior a 0, decrementem
 			strb r3, [r0]				@;i passem a la seguent posicio
 			b .L_final
 		.L_final:
-			add r1, #1
-			add r0, #2					@;seguent casella (words)
+			add r1, #1					@;augmentem index
+			add r0, #2					@;seguent casella (char ii + char im)
 			cmp r1, r6					@;comparem amb el final de la matriu
 			ble .L_recorreMatGel		@;si es mes petit o igual al final, passem a la seguent casella
 		

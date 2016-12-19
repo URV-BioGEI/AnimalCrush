@@ -205,9 +205,9 @@ recombina_elementos:
 		mov r1, #0					@;inicializamos filas
 	.L_buclefilasRECOMB2:
 		mov r2, #0					@;inicializamos columnas
+	.L_buclecolRECOMB2:
 		mov r3, #COLUMNS			@;guardem al temporal r3 el maxim de columnes
 		mul r12, r1, r3				@;r12=index files x columnes
-	.L_buclecolRECOMB2:
 		add r6, r12, r2				@;preparamos puntero
 		ldrb r3, [r8, r6]			@;R3 = valor casilla (r1, r2) mat_recomb2
 	@;caselles que requereixen codi:
@@ -226,23 +226,19 @@ recombina_elementos:
 		@;idem per les files
 		mov r0, #ROWS				@;li passem a mod_random el limit del nombre de files
 		bl mod_random				@;generem un numero de fila aleatori
-		push {r1-r3}
-		mov r3, r2					@;r3=columna destino
-		mov r2, r1					@;r2=fila destino
-		mov r1, r11					@;r1=columna origen
-		bl activa_elemento
-		pop {r1-r3}
+		mov r5, r0					@;r5=valor fila random
 		mov r0, #COLUMNS			@;fem servir r0 de temporal per guardar el total de columnes
 		mla r10, r5, r0, r11		@;r10 = (index fila*columna)+index columna casella aleatoria
-		ldrb r5, [r7, r10]			@;r5 = valor de mat_recomb1 a la casella aleatoria
+		ldrb r0, [r7, r10]			@;r0 = valor de mat_recomb1 a la casella aleatoria
 	@;hem de sumar el contador abans de tornar a començar el bucle (en cas de que trobem un 0)
 		add r9, #1					@;sumem 1 al contador
 		cmp r9, #2048				@;posem un maxim de iteracions
 		beq .L_FINAL				@;terminem el programa si fa masses iteracions (anem directament al final ja que voldra dir que no queden caselles de codi)
-		cmp r5, #0					@;comparem la casella aleatoria amb 0 (element ja usat)
+		cmp r0, #0					@;comparem la casella aleatoria amb 0 (element ja usat)
 		beq .L_casellarandom		@;si ja esta usada anem a buscar una altra
-		add r5, r3					@;si no esta usada afegim el valor random al codi base
-		strb r5, [r8, r6]			@;carreguem el valor random (r5) a mat_recomb2 en la posicio del puntero r6
+		add r0, r3					@;si no esta usada afegim el valor random al codi base
+		strb r0, [r8, r6]			@;carreguem el valor random (r0) a mat_recomb2 en la posicio del puntero r6
+		mov r12, r11				@;backup de la columna origen r12=r11(col origen)
 		mov r0, r8					@;passem la direccio base de la matriu
 		mov r11, r3					@;salvem el valor de r3 al temporal
 		mov r3, #2					@;li passem la direccio oest
@@ -259,6 +255,16 @@ recombina_elementos:
 		bge .L_casellarandom		@;tornem a buscar un altre casella random en cas de que trobem una secuencia
 		mov r3, #0					@;guardem al temporal 0
 		strb r3, [r7, r10]			@;una vez comprobamos que no hay secuencia, guardamos un 0 en la mat_recomb1
+		@;passar la posicio origen i posicio desti a activa_elemento
+		mov r3, r2					@;r3=columna destino
+		mov r0, r5					@;r0=fila origen
+		mov r10, r2					@;r10=r2 (col desti) salvada al temporal
+		mov r2, r1					@;r2=fila desti
+		mov r11, r1					@;r11=r1 (fil desti) salvada al temporal
+		mov r1, r12					@;r1=columna origen
+		bl activa_elemento
+		mov r2, r10					@;recuperem el valor de l'index de columnes
+		mov r1, r11					@;recuperem el valor de l'index de files
 	.L_finalRECOMB2:
 		@;si no forma cap repeticio, anem a la seguent posicio
 		add r6, #1					@;avanza posicion
@@ -294,7 +300,6 @@ recombina_elementos:
 		cmp r1, #ROWS				@;comprueba que no sea el final de columna
 		blo .L_buclefilasFIN		@;si no esta al final, avanza al siguiente elemento
 		pop {r0-r12, pc}
-
 
 
 @;:::RUTINAS DE SOPORTE:::

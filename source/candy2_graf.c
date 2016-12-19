@@ -191,6 +191,7 @@ void init_grafA()
 	// las baldosas para los fondos 1 y 2, cargar los colores de paleta
 	// correspondientes contenidos en la variable BaldosasPal[]
 		decompress(BaldosasTiles, bgGetGfxPtr(bg2A), LZ77Vram);			//cargar baldosas
+		decompress(BaldosasTiles, bgGetGfxPtr(bg1A), LZ77Vram);			//cargar baldosas
 		dmaCopy(BaldosasPal, BG_PALETTE, sizeof(BaldosasPal));				//cargar palette
 
 	
