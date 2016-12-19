@@ -81,10 +81,10 @@ rsi_timer2:
 			ldrb r3, [r0, #GEL_IM]			@;r3=camp im
 			add r3, #1
 			strb r3, [r0, #GEL_IM]			@;augmentem l'index im
-			cmp r3, #7					@;final simple
-			bgt .Fsimple
-			cmp r3, #15					@;final soble
-			bgt .Fdoble
+			cmp r3, #16					@;final doble +1
+			beq .Fdoble
+			cmp r3, #8					@;final simple +1
+			beq .Fsimple
 			b .L_final					@;sino esta al final de simple o doble passa a la seg posicio
 		.Fsimple:
 			mov r3, #0
