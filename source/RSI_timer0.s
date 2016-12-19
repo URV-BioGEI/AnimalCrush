@@ -63,7 +63,7 @@ rsi_vblank:
 		.Ldecrementa_columna_2ga:
 			sub r2, #1
 			mla r3, r1, r6, r2				@; possicio_actual = fila_actual * COLUMNS + columna_actual
-			mov r7, r3, lsl #2				@; multipliquem r6*2 (un element de la matriu d'estructures ocupa 2 possicions) "direccio baldosa+contungut"? 2Bytes
+			mov r7, r3, lsl #1				@; multipliquem r6*2 (un element de la matriu d'estructures ocupa 2 possicions) "direccio baldosa+contungut"? 2Bytes
 			ldrsb r0, [r5, r7]				@; ldrsb, perque el valor a carregar es signed extended, pot ser -1
 			cmp r0, #0						@; comparem valor de matriu.ii amb 0
 			bne .Lignorar_possicio_2ga

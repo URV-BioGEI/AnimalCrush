@@ -65,39 +65,34 @@ desactiva_timer2:
 	.global rsi_timer2
 rsi_timer2:
 		push {r0-r6, lr}
-		pop {r0-r6, pc}
 			ldr r0, =mat_gel			@;r0=mat_gel[][COLUMNS]
 			mov r1, #0					@;r1=index
-			mov r2, #ROWS
-			mov r3, #COLUMNS	
-			mul r5, r2, r3				@;r4=ROWS*COLUMNS
-			mov r2, #2
-			mul r6, r5, r2				@;r6=ROWS*COLUMNS*2
 		.L_recorreMatGel:
-			ldrb r3, [r0]				@;r3=camp ii
+			ldrb r3, [r0, #GEL_II]		@;r3=camp ii
 			cmp r3, #0
-			beq .Aumentar_Actualizar
-			tst r5, #0x80				@;comparem el bit de signe
-			bne .Decrementar
-			b .L_final					@;pa porsia
+			beq .Aumentar_Actualizar	@;si es 0, actualitza i augmenta im
+			tst r3, #0x80				@;comparem el bit de signe (1000 0000)
+			beq .Decrementar			@;si es positiu decrementar
+			b .L_final					@;si es -1 s'ha d'ignorar
 		.Aumentar_Actualizar:
 			ldr r4, =update_gel 		@;si el camp ii es un 0
 			mov r5, #1					@;posem un 1 a la variable update_gel
 			strb r5, [r4]				@;per actualitzar la metabaldosa
-			ldrb r3, [r0, #1]			@;r3=camp im
+			ldrb r3, [r0, #GEL_IM]			@;r3=camp im
 			add r3, #1
-			strb r3, [r0, #1]			@;augmentem l'index im
+			strb r3, [r0, #GEL_IM]			@;augmentem l'index im
 			cmp r3, #7					@;final simple
 			bgt .Fsimple
 			cmp r3, #15					@;final soble
 			bgt .Fdoble
+			b .L_final					@;sino esta al final de simple o doble passa a la seg posicio
 		.Fsimple:
 			mov r3, #0
-			strb r3, [r0, #1]			@;tornem al index im inicial de la simple
+			strb r3, [r0, #GEL_IM]			@;tornem al index im inicial de la simple
 			b .L_final
 		.Fdoble:
 			mov r3, #8
-			strb r3, [r0, #1]			@;tornem al index im inicial de la doble
+			strb r3, [r0, #GEL_IM]			@;tornem al index im inicial de la doble
 			b .L_final
 		.Decrementar:
 			sub r3, #1					@;si es superior a 0, decrementem
@@ -105,11 +100,11 @@ rsi_timer2:
 			b .L_final
 		.L_final:
 			add r1, #1					@;augmentem index
-			add r0, #2					@;seguent casella (char ii + char im)
-			cmp r1, r6					@;comparem amb el final de la matriu
+			add r0, #GEL_TAM			@;seguent casella (char ii + char im)
+			cmp r1, #ROWS*COLUMNS					@;comparem amb el final de la matriu
 			ble .L_recorreMatGel		@;si es mes petit o igual al final, passem a la seguent casella
 		
-		
+		pop {r0-r6, pc}
 
 
 .end
