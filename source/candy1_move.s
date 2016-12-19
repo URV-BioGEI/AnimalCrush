@@ -322,8 +322,8 @@ baja_laterales:
 		beq .passaseguent			@;Passem al següent element
 		cmp r6, #7
 		beq .passaseguent			@;Passem al següent element
-		and r6, #7					@;Netegem bits de gelatina
-		cmp r6, #0					@;Comparem amb 0
+		and r7, r6, #7					@;Netegem bits de gelatina
+		cmp r7, #0					@;Comparem amb 0
 		bne .passaseguent			@;Passem al següent element
 		mov r9, #0					@;posem flag a 0
 		@;Caselles de lesquerra

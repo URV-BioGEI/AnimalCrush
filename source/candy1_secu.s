@@ -227,11 +227,7 @@ marcar_horizontales:
 				mul r12, r2, r7				@; R12: fila per a coordena
 				add r11, r3, r12			@; R11: coordena matriz_marcas
 				ldrb r12, [r0, r11]			@; R12: veu que hi ha a la matriz_marcas en coordena R11
-				cmp r12, #0
-				beq .Lif23
 				cmp r12, #7
-				beq .Lif23
-				cmp r12, #8
 				beq .Lif23
 				cmp r12, #15				@; si a la casella hi ha un 7 o 15 saltem al final
 				beq .Lif23
@@ -315,11 +311,7 @@ marcar_verticales:
 				mul r12, r2, r7				@; R12: fila per a coordena
 				add r11, r3, r12			@; R11: coordena matriz_marcas
 				ldrb r12, [r0, r11]			@; R12: veu que hi ha a la matriz_marcas en coordena R11
-				cmp r12, #0
-				beq .Lfinwhile33
 				cmp r12, #7
-				beq .Lfinwhile33
-				cmp r12, #8
 				beq .Lfinwhile33
 				cmp r12, #15				@; si a la casella hi ha un 7 o 15 saltem al final
 				beq .Lfinwhile33
