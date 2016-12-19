@@ -226,14 +226,12 @@ recombina_elementos:
 		@;idem per les files
 		mov r0, #ROWS				@;li passem a mod_random el limit del nombre de files
 		bl mod_random				@;generem un numero de fila aleatori
-		mov r5, r0					@;r5=valor fila random
-		push {r0-r3, r5, r11}
-		mov r0, r5					@;r0=fila origen
+		push {r1-r3}
 		mov r3, r2					@;r3=columna destino
 		mov r2, r1					@;r2=fila destino
 		mov r1, r11					@;r1=columna origen
 		bl activa_elemento
-		pop {r0-r3, r5, r11}
+		pop {r1-r3}
 		mov r0, #COLUMNS			@;fem servir r0 de temporal per guardar el total de columnes
 		mla r10, r5, r0, r11		@;r10 = (index fila*columna)+index columna casella aleatoria
 		ldrb r5, [r7, r10]			@;r5 = valor de mat_recomb1 a la casella aleatoria

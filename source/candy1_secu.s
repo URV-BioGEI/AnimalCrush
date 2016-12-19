@@ -57,9 +57,9 @@ hay_secuencia:
 				ldrb r11, [r0, r10]
 				cmp r11, #7
 				beq .Lif2
-				cmp r11, #8
-				beq .Lif2
 				cmp r11, #15
+				beq .Lif2
+				cmp r11, #8
 				beq .Lif2
 				cmp r11, #16
 				beq .Lif2

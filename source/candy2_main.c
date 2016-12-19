@@ -96,11 +96,9 @@ int main(void)
 		if (initializing)		//////	SECCIÓN DE INICIALIZACIÓN	//////
 		{
 			inicializa_matriz(matrix, level);
-			//copia_mapa(matrix, 0);
 			genera_sprites(matrix);
 			genera_mapa1(matrix);
 			genera_mapa2(matrix);
-			escribe_matriz(matrix);
 			retardo(5);
 			initializing = 0;
 			falling = 0;
@@ -111,7 +109,6 @@ int main(void)
 			{
 				elimina_secuencias(matrix, mat_mar);	// eliminarlas
 				points += calcula_puntuaciones(mat_mar);
-				escribe_matriz(matrix);
 				falling = 1;							// iniciar bajada
 				fall_init = 1;
 			}
@@ -142,14 +139,12 @@ int main(void)
 				}
 				else change = 1;				// sino, revisar estado matriz
 			}
-			escribe_matriz(matrix);			// visualiza bajadas o eliminaciones
 		}
 		else					//////	SECCIÓN DE JUGADAS	//////
 		{
 			if (procesar_touchscreen(matrix, &mX, &mY, &dX, &dY))
 			{
 				intercambia_posiciones(matrix, mX, mY, dX, dY);
-				escribe_matriz(matrix);	  // muestra el movimiento por pantalla
 				if (hay_secuencia(matrix))	// si el movimiento es posible
 				{
 					elimina_secuencias(matrix, mat_mar);
@@ -167,7 +162,6 @@ int main(void)
 				{							// deshacer el cambio
 					intercambia_posiciones(matrix, mX, mY, dX, dY);
 				}
-				escribe_matriz(matrix);	// muetra las eliminaciones o el retorno
 			}
 			while (keysHeld() & KEY_TOUCH)		// esperar a liberar la
 			{	swiWaitForVBlank();				// pantalla táctil
@@ -231,7 +225,6 @@ int main(void)
 					recombina_elementos(matrix);
 					activa_timer0(1);		// activar timer de movimientos
 					while (timer0_on) swiWaitForVBlank();	// espera final
-					escribe_matriz(matrix);
 					change = 1;					// forzar nueva verificación
 				}								// de combinaciones
 				borra_puntuaciones();

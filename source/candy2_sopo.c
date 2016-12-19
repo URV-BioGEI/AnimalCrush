@@ -21,45 +21,6 @@ int ult_tex = 0;				// último número de textos de puntuación
 int num_pun = 0;				// número de puntuaciones
 
 
-
-/* escribe_matriz(*mat): escribe por pantalla de texto de la NDS el contenido
-	de la matriz usando secuencias escape de posicionamiento en fila y
-	columna (\x1b['fila';'columna'H), donde 'fila' es una coordenada entre 0 y
-	23, y columna es una coordenada entre 0 y 31, y la posición (0,0) correspon-
-	de a la casilla superior izquierda;
-	además, se usa la secuencia escape para cambiar el color del texto
-	(\x1b['color'm), donde 'color' es un código de color de la librería NDS */
-void escribe_matriz(char mat[][COLUMNS])
-{
-	int i, j, value, color;
-
-	for (i = 0; i < ROWS; i++)			// para todas las filas
-	{
-		for (j = 0; j < COLUMNS; j++)	// para todas las columnas
-		{
-			value = mat[i][j];		// obtiene el valor del elemento (i,j)
-			if (value != 15)
-			{
-				if (value == 7)
-					color = 39;				// el color del bloque
-				else if (value > 16)
-					color = 38;				// el color de la gelatina doble
-				else if (value > 8)
-					color = 37;				// el color de la gelatina simple
-				else
-					color = 40+value;		// el color normal
-				printf("\x1b[%dm", color);
-				if (value == 255)
-					printf("\x1b[%d;%dH_ ",(i*2+DFIL),(j*2+1));
-				else
-					printf("\x1b[%d;%dH%d ",(i*2+DFIL),(j*2+1),(value % 8));
-			}
-			else printf("\x1b[%d;%dH  ",(i*2+DFIL),(j*2+1));
-		}
-	}
-}
-
-
 /* contar_gelatinas(*mat): calcula cuantas gelatinas quedan en la matriz de
 	juego, contando 1 para gelatines simples y 2 para gelatinas dobles */
 int contar_gelatinas(char mat[][COLUMNS])
@@ -172,7 +133,6 @@ void reducir_elementos(char mat[][COLUMNS])
 		ele_sug[i] = mat[y][x];
 		mat[y][x] = -1;
 	}
-	escribe_matriz(mat);
 	activa_timer1(0);
 	while (timer1_on) swiWaitForVBlank();
 }
@@ -195,7 +155,6 @@ void aumentar_elementos(char mat[][COLUMNS])
 		desactiva_escalado(y, x);
 		mat[y][x] = ele_sug[i];
 	}
-	escribe_matriz(mat);
 }
 
 

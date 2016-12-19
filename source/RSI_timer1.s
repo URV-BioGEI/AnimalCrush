@@ -12,7 +12,7 @@
 		.align 2
 		.global timer1_on
 	timer1_on:	.hword	0 			@;1 -> timer1 en marcha, 0 -> apagado
-	divFreq1: .hword	-1431		@;divisor de frecuencia para timer 1 per a 0,35s amb freq. entrada 130914,9921875 Hz
+	divFreq1: .hword	-5727,5		@;divisor de frecuencia para timer 1 per a 0,35s amb freq. entrada 523656,96875 Hz
 
 
 @;-- .bss. variables (globales) no inicializadas ---
@@ -44,7 +44,7 @@ activa_timer1:
 			ldr r2, =divFreq1
 			ldrh r3, [r2]
 			ldr r2, =0x04000104			@;Timer1_data
-			orr r3, #0x00C20000			@;Mascara 1100 0010 per activar el timer i def freq, amb 130915 Hz d'entrada
+			orr r3, #0x00C10000			@;Mascara 1100 0001 per activar el timer i def freq, amb 523657 Hz d'entrada
 			str r3, [r2]
 			mov r1, #0
 			ldr r2, =escNum
@@ -102,7 +102,7 @@ rsi_timer1:
 			ldrh r1, [r0]
 			ldr r0, =escFac
 			ldrh r2, [r0]
-			cmp r1, #0					@;Si escSen = 0 decrementar escFac, si es 1 incrementar escFac
+			cmp r1, #0					@;Si escSen = 1 decrementar escFac, si es 0 incrementar escFac
 			subne r2, #32
 			cmp r1, #0
 			addeq r2, #32
