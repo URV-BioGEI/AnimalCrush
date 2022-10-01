@@ -363,7 +363,7 @@ baja_laterales:
 		beq .passaseguent			@;passa al seguent si no hi ha cap element susceptible de per baixat
 		@;SECCIO D'ELECCIO ALEATORIA
 		@; Llavors el flag es 3 i podem baixar pels dos llocs, per tant generem laleatori
-		mov r0, #1					@;Carreguem un 1 a r0 (per a passar parametre)
+		mov r0, #2					@;Carreguem un 2 a r0 (per a passar parametre)
 		bl mod_random				@;cridem mod random
 		cmp r0, #0					@;Si no es 0			
 		bne .Dreta					@;Anem a la dreta arbitrariament

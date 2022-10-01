@@ -7,7 +7,7 @@
 
 @;-- .bss. data section ---
 .bss
-		.align 1
+		.align 2
 	oam_data:	.space 128 * 8		@; espacio de trabajo para 128 sprites
 
 @;-- .text. Program code ---

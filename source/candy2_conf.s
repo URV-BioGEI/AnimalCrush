@@ -15,7 +15,7 @@
 @;								(MAXLEVEL está definida en "include/candy1.h")
 @;	cada límite debe ser un número entre 3 y 99.
 		.global max_mov
-	max_mov:	.byte 20, 27, 11, 25, 24, 8, 21, 30, 25
+	max_mov:	.byte 20, 27, 11, 25, 24, 20, 21, 30, 25
 
 
 @; objetivo de puntos para cada nivel;
