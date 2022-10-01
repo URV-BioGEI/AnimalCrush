@@ -21,7 +21,7 @@
 /* variables globales */
 char matrix[ROWS][COLUMNS];		// matriz global de juego
 int seed32;						// semilla de números aleatorios
-int level = 0;					// nivel del juego (nivel inicial = 0)
+int level = 9;					// nivel del juego (nivel inicial = 0)
 int points;						// contador global de puntos
 int movements;					// número de movimientos restantes
 int gelees;						// número de gelatinas restantes
@@ -95,7 +95,7 @@ int main(void)
 	{
 		if (initializing)		//////	SECCIÓN DE INICIALIZACIÓN	//////
 		{
-			inicializa_matriz(matrix, 4);
+			inicializa_matriz(matrix, level);
 			//copia_mapa(matrix, 4);
 			genera_sprites(matrix);
 			genera_mapa1(matrix);
